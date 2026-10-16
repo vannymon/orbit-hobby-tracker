@@ -195,6 +195,22 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
 .menu button{text-align:left;padding:10px 12px;border-radius:9px;font-size:14.5px;color:var(--ink)}.menu button:hover{background:var(--line)}
 .ltag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:4px}
 .inl.it{font-size:20px;font-weight:700}.inl.notes{font-size:14.5px;line-height:1.45;min-height:72px}
+.onb{position:absolute;inset:0;z-index:15;background:var(--screen);display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top,0px)) 24px calc(20px + env(safe-area-inset-bottom,0px))}
+.onb .bar{display:flex;align-items:center;justify-content:space-between;min-height:36px}
+.onb .dots3{display:flex;gap:6px}.onb .dots3 i{width:7px;height:7px;border-radius:4px;background:var(--line);transition:all .3s}.onb .dots3 i.on{width:20px;background:var(--ink)}
+.onb .body{flex:1;overflow-y:auto;padding-top:8px;animation:onbIn .4s cubic-bezier(.2,.8,.3,1)}
+@keyframes onbIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.onb .body{animation:none}}
+.onb h2{font-size:27px;font-weight:800;letter-spacing:-.5px;margin:6px 0 8px;line-height:1.15}
+.onb .lead{font-size:15px;color:var(--soft);line-height:1.45;margin:0 0 18px}
+.onb .pt{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}.onb .pt .t{font-size:15px}.onb .pt .s{font-size:13.5px;line-height:1.4}
+.onb .foot{display:grid;gap:12px;padding-top:12px}
+.onb .btn[disabled]{opacity:.35}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chipb{display:grid;justify-items:center;gap:6px;padding:12px 4px;border-radius:16px;background:var(--card);border:2px solid transparent;font-size:13px;font-weight:600}
+.onb .disc{border-radius:50%;display:grid;place-items:center;flex:none}
+.chipb.on{border-color:var(--ink)}.chipb .disc{pointer-events:none}
+.onb .addown{display:flex;gap:8px;margin-top:12px}.onb .addown .field{flex:1}
 .pg-ic{width:20px;text-align:center;color:var(--soft);font-weight:700}.goaltag{color:var(--soft);font-style:italic}
 .loghead{display:flex;justify-content:space-between;align-items:center;margin:20px 0 4px}
 .seg.state button.on{font-weight:700}
@@ -233,6 +249,7 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
  <symbol id="i-run" viewBox="0 0 24 24"><circle cx="14" cy="4.5" r="1.8"/><path d="M6 21l3-5 3 2 1-5 3 3h3M9 11l3-3 3 1 1 3"/></symbol>
  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
  <symbol id="i-climb" viewBox="0 0 24 24"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="5" r="2"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7z"/></symbol>
  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
  <symbol id="ui-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
  <symbol id="ui-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><ellipse cx="12" cy="12" rx="9.5" ry="5.5"/></symbol>
@@ -256,13 +273,14 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
   </nav>
   <div class="scrim" id="scrim"></div>
   <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+  <div class="onb" id="onb" role="dialog" aria-modal="true" aria-label="Welcome to My Orbit" hidden></div>
   <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
 </div>
 
 <script>
 (function(){
 const DAY=864e5, KEY='orbit-proto-v2';
-const ICONS=['bike','camera','palette','pot','book','guitar','needle','plant','run','music','climb','code'];
+const ICONS=['bike','camera','palette','pot','book','guitar','needle','plant','run','music','climb','code','spark'];
 const TINTS=['coral','violet','leaf','honey','sky','rose','mint','sand'];
 const ago=d=>new Date(Date.now()-d*DAY).toISOString();
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -302,7 +320,7 @@ function seed(){
   ], archived:[], archivedIdeas:[], prefs:{weekly:true,day:'Sunday',time:'18:00',theme:'system'}};
 }
 let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-if(!S||!S.hobbies) S=seed();
+const fresh=!S||!S.hobbies; if(fresh) S={slots:3,hobbies:[],ideas:[],archived:[],archivedIdeas:[],prefs:{}};
 S.archivedIdeas=S.archivedIdeas||[];
 [...S.ideas,...S.archivedIdeas].forEach(i=>{ if(i.link&&!i.notes) i.notes=i.link; delete i.link; }); S.prefs=Object.assign({weekly:true,day:'Sunday',time:'18:00',theme:'system'},S.prefs||{});
 const applyTheme=()=>{ const r=document.documentElement; if(S.prefs.theme==='system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme',S.prefs.theme); };
@@ -529,6 +547,7 @@ function renderSettings(){
     <div class="label">About</div>
     <button class="line linkline" data-act="about" data-k="privacy"><span>Privacy policy</span><span class="s">›</span></button>
     <button class="line linkline" data-act="about" data-k="support"><span>Help and support</span><span class="s">›</span></button>
+    <button class="line linkline" data-act="onbpreview"><span>Replay the welcome screens</span><span class="s">Preview ›</span></button>
     <div class="s" style="text-align:center;margin-top:18px">My Orbit · V0.1</div>
   `;
   $('#v-settings').querySelectorAll('select.pick').forEach(el=>el.onchange=()=>{ S.prefs[el.dataset.pref]=el.value; save(); renderSettings(); toast('Check-in updated'); });
@@ -842,8 +861,9 @@ document.addEventListener('click',e=>{
   if(a==='dodownload'){ const k=t.dataset.k; (k==='json'?saveFile('my-orbit-backup.json','application/json',JSON.stringify(S,null,2)):saveFile('my-orbit-logs.csv','text/csv',csvOf())).then(r=>toast(r==='saved'?'Saved':r==='declined'?'Not saved':"Couldn't save here. Use Copy instead")); return; }
   if(a==='copyexport'){ const k=t.dataset.k, txt=k==='json'?JSON.stringify(S,null,2):csvOf(); (navigator.clipboard?.writeText(txt)||Promise.reject()).then(()=>toast('Copied'),()=>toast("Couldn't copy here")); return; }
   if(a==='wipe') return sheetWipe();
-  if(a==='dowipe'){ S={slots:S.slots,hobbies:[],ideas:[],archived:[],archivedIdeas:[],prefs:S.prefs}; save(); closeSheet(); renderAll(); setTab('orbit'); return toast('All data deleted'); }
+  if(a==='dowipe'){ S={slots:S.slots,hobbies:[],ideas:[],archived:[],archivedIdeas:[],prefs:S.prefs}; save(); closeSheet(); renderAll(); setTab('orbit'); return startOnb(false); }
   if(a==='about') return sheetAbout(t.dataset.k);
+  if(a==='onbpreview') return startOnb(true);
   if(a==='archiveidea'){ const before=JSON.stringify(S),i=S.ideas.find(x=>x.id===id); S.ideas=S.ideas.filter(x=>x.id!==id); S.archivedIdeas.unshift(i); save(); closeSheet(); renderAll(); return toast('Idea archived',()=>{S=JSON.parse(before);save();renderAll();}); }
   if(a==='restoreidea'){ const i=S.archivedIdeas.find(x=>x.id===id); S.archivedIdeas=S.archivedIdeas.filter(x=>x.id!==id); S.ideas.unshift(i); save(); renderAll(); return toast(`"${i.title}" is back in Ideas`); }
   if(a==='delarchidea'){ const before=JSON.stringify(S),i=S.archivedIdeas.find(x=>x.id===id); S.archivedIdeas=S.archivedIdeas.filter(x=>x.id!==id); save(); renderAll(); return toast('Idea deleted',()=>{S=JSON.parse(before);save();renderAll();}); }
@@ -890,6 +910,71 @@ document.addEventListener('click',e=>{
   if(a==='slots'){ const n=Math.min(5,Math.max(1,S.slots+ +t.dataset.d)); if(n<inPlay().length) return toast(`Rest a hobby first. ${inPlay().length} are in orbit.`); S.slots=n; save(); renderAll(); return; }
   if(a==='tab-settings') return setTab('settings');
 });
+/* ---------- ONBOARDING ---------- */
+// Three short screens for a new user: the idea, pick hobbies, choose a Focus (goal optional).
+// preview=true (Settings > Replay) walks the same screens without changing any data.
+const STARTERS=[['Cycling','bike'],['Photography','camera'],['Drawing','palette'],['Cooking','pot'],['Reading','book'],['Guitar','guitar'],['Sewing','needle'],['Gardening','plant'],['Running','run'],['Music','music'],['Climbing','climb'],['Coding','code']];
+let ob=null;
+function startOnb(preview){ closeSheet(); ob={step:0,preview,picks:[],focus:null,goal:''}; $('#onb').hidden=false; drawOnb(); }
+function endOnb(){ $('#onb').hidden=true; $('#onb').innerHTML=''; ob=null; }
+const pickDisc=(p,size)=>disc({icon:p.icon,tint:p.tint},size);
+function drawOnb(){
+  const el=$('#onb'), st=ob.step, max=S.slots;
+  const bar=`<div class="bar">${st?`<button class="s" data-onb="back" style="font-size:14px">Back</button>`:'<span></span>'}<span class="dots3">${[0,1,2].map(i=>`<i class="${i===st?'on':''}"></i>`).join('')}</span>${st<2?`<button class="s" data-onb="skip" style="font-size:14px">${ob.preview?'Close':'Skip'}</button>`:'<span style="width:30px"></span>'}</div>`;
+  let body='', foot='';
+  if(st===0){
+    body=`<svg viewBox="0 0 200 120" width="100%" height="130" aria-hidden="true" style="display:block;margin:6px 0 4px">
+        <ellipse cx="100" cy="60" rx="92" ry="54" fill="none" stroke="var(--faint)" stroke-dasharray="3 5"/><ellipse cx="100" cy="60" rx="58" ry="34" fill="none" stroke="var(--line)" stroke-width="1.5"/>
+        <circle cx="100" cy="60" r="20" fill="var(--t-violet)"/><circle cx="48" cy="44" r="10" fill="var(--t-coral)"/><circle cx="150" cy="48" r="10" fill="var(--t-leaf)"/><circle cx="118" cy="92" r="10" fill="var(--t-sky)"/>
+        <circle cx="16" cy="78" r="6" fill="var(--rest-bg)"/><circle cx="186" cy="34" r="6" fill="var(--rest-bg)"/><circle cx="70" cy="110" r="6" fill="var(--rest-bg)"/></svg>
+      <h2>Welcome to My Orbit</h2><p class="lead">A calm place to keep track of the things you love doing.</p>
+      <div class="pt"><span class="disc" style="width:34px;height:34px;background:var(--t-violet)"></span><span><span class="t" style="display:block">One Focus</span><span class="s">The hobby you most want to move forward. You choose it, and it only changes when you say so.</span></span></div>
+      <div class="pt"><span class="disc" style="width:34px;height:34px;background:var(--t-leaf)"></span><span><span class="t" style="display:block">A few in orbit</span><span class="s">The others you're doing right now. ${max} at a time, so you have to choose.</span></span></div>
+      <div class="pt"><span class="disc" style="width:34px;height:34px;background:var(--rest-bg)"></span><span><span class="t" style="display:block">The rest, resting</span><span class="s">Nothing is lost or overdue. Leave a note, and pick up where you left off when it comes back.</span></span></div>
+      <p class="s" style="text-align:center;margin:4px 0 0">No streaks, no timers, nothing turns red.</p>`;
+    foot=`<button class="btn" data-onb="next">Get started</button>${!ob.preview&&!S.hobbies.length?`<button class="s" data-onb="examples" style="font-size:13.5px;text-decoration:underline">Look around with example hobbies first</button>`:''}`;
+  }
+  if(st===1){
+    const on=n=>ob.picks.some(p=>p.name===n), extra=ob.picks.filter(p=>!STARTERS.some(([n])=>n===p.name));
+    body=`<h2>What are you into right now?</h2><p class="lead">Pick up to ${max}. They go in your orbit, and you can add more later.</p>
+      <div class="chips">${[...STARTERS.map(([n,i])=>({name:n,icon:i})),...extra].map(c=>{ const p=ob.picks.find(x=>x.name===c.name), tint=p?p.tint:'sand';
+        return `<button class="chipb${p?' on':''}" data-onb="pick" data-n="${esc(c.name)}" data-i="${c.icon}" aria-pressed="${!!p}">${disc({icon:c.icon,tint:p?tint:'none'},38).replace('var(--t-none)','var(--card)').replace('var(--i-none)','var(--soft)')}${esc(c.name)}</button>`; }).join('')}</div>
+      <form class="addown" id="onbOwn"><input class="field" id="onbOwnIn" placeholder="Something else" autocomplete="off" aria-label="Another hobby"><button class="pill" type="submit">Add</button></form>`;
+    foot=`<button class="btn" data-onb="next" ${ob.picks.length?'':'disabled'}>${ob.picks.length?`Next (${ob.picks.length} picked)`:'Pick at least one'}</button>`;
+  }
+  if(st===2){
+    if(!ob.picks.some(p=>p.name===ob.focus)) ob.focus=ob.picks[0].name;
+    body=`<h2>Which one is your Focus?</h2><p class="lead">It sits in the middle of your orbit. You can change it any time.</p>
+      ${ob.picks.map(p=>`<button class="line pickrow" style="width:100%" data-onb="focus" data-n="${esc(p.name)}"><span style="display:flex;gap:12px;align-items:center">${pickDisc(p,32)}<span class="t">${esc(p.name)}</span></span><span class="radio${p.name===ob.focus?' on':''}"></span></button>`).join('')}
+      <div class="label">A goal for ${esc(ob.focus)}? (optional)</div>
+      <input class="field" id="onbGoal" placeholder="What would done look like?" value="${esc(ob.goal)}" autocomplete="off" aria-label="Goal">
+      <p class="hint" style="margin-top:8px">Skip it if you just want to enjoy it. You can add one later from the ⋮ menu.</p>`;
+    foot=`<button class="btn" data-onb="finish">${ob.preview?'Finish preview':'Start my orbit'}</button>`;
+  }
+  el.innerHTML=`${bar}<div class="body">${body}</div><div class="foot">${foot}</div>`;
+  const f=$('#onbOwn'); if(f) f.onsubmit=e=>{ e.preventDefault(); const v=$('#onbOwnIn').value.trim(); if(!v) return;
+    if(ob.picks.some(p=>p.name.toLowerCase()===v.toLowerCase())) return toast(`${v} is already picked`);
+    if(ob.picks.length>=max) return toast(`You can pick ${max}. Add more after.`);
+    const used=ob.picks.map(p=>p.icon); ob.picks.push({name:v,icon:'spark',tint:TINTS[ob.picks.length%TINTS.length]}); drawOnb(); };
+  const g=$('#onbGoal'); if(g) g.oninput=()=>{ ob.goal=g.value; };
+}
+$('#onb').addEventListener('click',e=>{ const t=e.target.closest('[data-onb]'); if(!t||!ob) return; const k=t.dataset.onb;
+  if(k==='next'){ ob.step++; return drawOnb(); }
+  if(k==='back'){ ob.step--; return drawOnb(); }
+  if(k==='skip'){ if(!ob.preview) save(); return endOnb(); }
+  if(k==='examples'){ S=seed(); save(); endOnb(); renderAll(); setTab('orbit'); return toast('These are example hobbies. Delete all data in Settings to start fresh.'); }
+  if(k==='pick'){ const n=t.dataset.n, i=ob.picks.findIndex(p=>p.name===n);
+    if(i>=0) ob.picks.splice(i,1); else { if(ob.picks.length>=S.slots) return toast(`You can pick ${S.slots}. Add more after.`); ob.picks.push({name:n,icon:t.dataset.i,tint:TINTS[ob.picks.length%TINTS.length]}); }
+    ob.picks.forEach((p,j)=>p.tint=TINTS[j%TINTS.length]); return drawOnb(); }
+  if(k==='focus'){ ob.focus=t.dataset.n; return drawOnb(); }
+  if(k==='finish'){ const goal=($('#onbGoal')?.value||'').trim();
+    if(ob.preview){ endOnb(); return toast('Preview finished. Nothing was changed.'); }
+    let fid=null;
+    ob.picks.forEach(p=>{ const isF=p.name===ob.focus, id=uid(); if(isF) fid=id;
+      S.hobbies.push({id,name:p.name,icon:p.icon,tint:p.tint,status:'play',focus:isF,goal:isF&&goal?{kind:'goal',title:goal,next:'',ms:[]}:{kind:'fun',title:'',next:'',ms:[]},logs:[],restedAt:null,pickup:'',keeps:0}); });
+    save(); endOnb(); pulseId=fid; renderAll(); setTab('orbit'); return toast('Your orbit is ready'); }
+});
+
 function resetAll(){ S=seed(); save(); applyTheme(); closeSheet(); renderAll(); setTab('orbit'); toast('Example data reset'); }
 
 function setTab(name){
@@ -901,6 +986,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab)
 function renderAll(){ renderOrbit(); renderIdeas(); renderSettings(); }
 window.addEventListener('resize',()=>{ if(!$('#v-orbit').hidden) renderOrbit(); });
 renderAll();
+if(fresh) startOnb(false);
 })();
 </script>
 

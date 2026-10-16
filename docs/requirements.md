@@ -95,7 +95,15 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
   - **Export logs (CSV):** one row per log, with hobby, status, date, note and photo count.
   - Both exports show a preview with **Download** and **Copy**.
   - **Delete all data:** a confirm screen with **Export first** offered. It can't be undone.
-- **About:** **Privacy policy** and **Help and support**, which links to vanonghuijuan@gmail.com.
+- **About:** **Privacy policy** and **Help and support**, which links to vanonghuijuan@gmail.com. **Replay the welcome screens** walks through onboarding as a preview without changing anything.
+
+### 2.10 Onboarding (first open, van 16 Oct)
+Three full-screen steps with progress dots, a **Back** link and a **Skip** link (Skip opens an empty orbit).
+1. **Welcome to My Orbit:** a small orbit drawing and "A calm place to keep track of the things you love doing." Then three points: **One Focus** (you choose it; it only changes when you say so), **A few in orbit** (3 at a time, so you choose) and **The rest, resting** (nothing lost or overdue; leave a note and pick up later). It ends with "No streaks, no timers, nothing turns red." and **Get started**. *Prototype only:* a "Look around with example hobbies first" link loads the example data.
+2. **What are you into right now?** Pick up to 3 (the orbit limit) from 12 starter hobbies with icons, or type your own under **Something else**. Typed hobbies get a generic sparkle icon, which can be changed later in Edit hobby. **Next** stays disabled until one is picked.
+3. **Which one is your Focus?** Choose one of the picks, then add an optional goal ("What would done look like?"). Without a goal it's Just for fun. **Start my orbit** creates the hobbies in orbit, with the Focus in the centre, and shows "Your orbit is ready".
+
+Onboarding shows on the first open, and again after **Delete all data**.
 
 ## 3. Features (v1.0)
 
@@ -113,7 +121,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 | Archive + restore | ✅ | Hobbies and ideas, from their pages. Restore from Settings → Archive. |
 | Delete hobby or idea | ✅ | Hobby: a confirm sheet saying how many logs and photos go, with "Archive instead". Both have Undo. |
 | Hobbies tab: tiles, activity, cards | ✅ | 2.7 |
-| Onboarding | ✅ | One screen explaining the idea, then add your first hobby. Goals optional. *Not in the prototype yet; it shows an empty orbit.* |
+| Onboarding | ✅ | Three steps: the idea, pick hobbies, choose a Focus with an optional goal (2.10). |
 | Weekly local notification | ✅ | Settings 2.9. *The prototype saves the setting but sends nothing.* |
 | Export / delete all | ✅ | 2.9 |
 | Appearance | ✅ | Match phone / Light / Dark |
@@ -157,7 +165,7 @@ The app is free and iPhone-first, with an individual developer account. Data sta
 ## 7. Prototype vs. this spec
 
 The clickable prototype covers sections 2.1–2.9, except:
-- **Not built yet:** trials, revisit dates, "Has an end" / Finished, onboarding, the "Still curious?" card on Orbit, and a real notification.
+- **Not built yet:** trials, revisit dates, "Has an end" / Finished, the "Still curious?" card on Orbit, and a real notification.
 - **Prototype only:** data is kept in the browser's storage, and photos there fill up after roughly 20–40. There is no reset button; Settings → Delete all data starts fresh.
 - **Export on the claude.ai link** asks before saving the file. On a normal web host it downloads directly.
 
