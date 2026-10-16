@@ -373,7 +373,7 @@ function renderOrbit(){
       <div class="cardhead"><span class="t">${esc(f.name)}</span>${msDots(f.goal)}</div>
       ${f.goal.kind==='goal'?`<div class="s" style="margin-top:2px">Goal: ${esc(f.goal.title)}</div>`:`<div class="s" style="margin-top:2px">Just for fun</div>`}
       <div class="next">${f.goal.next?`Next: ${esc(f.goal.next)}`:`<span class="s">No next step. Just enjoy it.</span>`}</div>
-      <button class="btn" data-act="log" data-id="${f.id}">Log it</button>
+      <button class="btn" data-act="log" data-id="${f.id}">Log Progress</button>
     </div>` : `<div class="card"><div class="t">No Focus right now</div><div class="next s">${inPlay().length?'Tap a hobby and pick Focus. The app never picks one for you.':'Tap + to add your first hobby, then pick it as your Focus.'}</div></div>`;
   $('#v-orbit').innerHTML=`
     <div class="head"><div><h1>My Orbit</h1><div class="sub">${play.length} in orbit · ${rest.length} resting</div></div>

@@ -33,7 +33,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 - **Motion:** both rings turn slowly together, about one lap every 3 minutes, with Focus fixed in the centre. Rotation pauses while a sheet is open. Resting bubbles drift gently, and a bubble pulses once when you log it or make it Focus. All motion is off with Reduce Motion.
 - **Below the orbit:**
   - At most **one surfacing card**: a bench check ("Guitar has rested 6 weeks. Still want it on the bench?" with Bring it back, Keep resting or Archive), a trial ending, or a revisit date.
-  - **Next up:** the Focus hobby's card with its goal, progress dots, next step and **Log it**. With no Focus it says "No Focus right now". With no hobbies at all it says to tap + to add your first.
+  - **Next up:** the Focus hobby's card with its goal, progress dots, next step and **Log Progress** (renamed from Log it, van 16 Oct). With no Focus it says "No Focus right now". With no hobbies at all it says to tap + to add your first.
   - **In orbit:** a row for each other hobby in orbit, showing its next step (or when it was last logged) and a **Log** button.
 
 ### 2.2 Hobby page (tap a bubble, row or card)
