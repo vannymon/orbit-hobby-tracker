@@ -8,14 +8,15 @@ This is a clickable web prototype of the iPhone app, used to test the design bef
 
 ## Testing it
 
-- Open the link on a phone for the real feel. On a laptop it shows in a phone frame, with a short list of things to try beside it.
-- It starts with example hobbies. On a laptop, "Reset example data" in the side notes brings them back. To start empty, use Settings → Delete all data.
+- **On iPhone:** open the link in Safari, tap Share, then **Add to Home Screen**. It then opens full-screen with its own icon, like an app.
+- It starts with example hobbies. To start fresh, use Settings → Delete all data.
 - Photos are kept in browser storage, which fills up after roughly 20–40 photos. The real app stores them as files.
 - Not built yet: trials, revisit dates, onboarding and real notifications.
 
 ## Files
 
 - `index.html`: the whole prototype in one file, with no build step.
+- `manifest.webmanifest`, `icon-*.png`: the home-screen name and icon.
 - `docs/requirements.md`: the v1.0 product requirements the prototype follows.
 
 ## Plan

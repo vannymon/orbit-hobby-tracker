@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1922" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Orbit">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
 <title>My Orbit prototype</title>
@@ -51,17 +59,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
 svg.ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.notes{max-width:300px;color:var(--soft);font-size:14px;line-height:1.5}
-.notes h2{color:var(--ink);font-size:22px;margin:0 0 8px;text-wrap:balance}
-.notes ol{padding-left:18px;margin:8px 0 0;display:grid;gap:6px}
-.notes .reset{margin-top:14px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:underline}
 
 .phone{width:390px;height:780px;max-height:calc(100vh - 48px);border-radius:48px;border:10px solid var(--frame);
   background:var(--screen);position:relative;overflow:hidden;flex:none;display:flex;flex-direction:column}
 @media (max-width:760px){
   body{padding:0;display:block}
-  .notes{display:none}
-  .phone{width:100%;height:100%;max-height:none;border:0;border-radius:0}
+    .phone{width:100%;height:100dvh;max-height:none;border:0;border-radius:0;padding-top:env(safe-area-inset-top,0px)}
 }
 .view{flex:1;overflow-y:auto;padding:22px 20px 24px}
 .view[hidden],[hidden]{display:none!important}
@@ -227,19 +230,6 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
  <symbol id="ui-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
 </svg>
 
-<aside class="notes">
-  <h2>My Orbit prototype</h2>
-  This is a clickable test of the Orbit design with example hobbies. Your taps are saved in this browser only.
-  <ol>
-    <li>Tap <b>Log it</b> on Cycling and tick "Finished the next step?"</li>
-    <li>Tap the small <b>Guitar</b> bubble on the outer ring to bring it back.</li>
-    <li>Tap any bubble to see its page, then use <b>Make Focus</b>.</li>
-    <li>Add a hobby with <b>+</b> and try "Just for fun".</li>
-    <li>Log something and <b>add a photo</b>, then look at Cycling's page.</li>
-    <li>Open <b>Hobbies</b> for everything at a glance, and add an idea there.</li>
-  </ol>
-  <button class="reset" id="resetBtn" type="button">Reset example data</button>
-</aside>
 
 <div class="phone" id="app">
   <section class="view" id="v-orbit" aria-label="Orbit"></section>
@@ -840,7 +830,6 @@ document.addEventListener('click',e=>{
   if(a==='tab-settings') return setTab('settings');
 });
 function resetAll(){ S=seed(); save(); applyTheme(); closeSheet(); renderAll(); setTab('orbit'); toast('Example data reset'); }
-$('#resetBtn').onclick=resetAll;
 
 function setTab(name){
   document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===name));

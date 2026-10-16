@@ -157,7 +157,7 @@ The app is free and iPhone-first, with an individual developer account. Data sta
 
 The clickable prototype covers sections 2.1–2.9, except:
 - **Not built yet:** trials, revisit dates, "Has an end" / Finished, onboarding, the "Still curious?" card on Orbit, and a real notification.
-- **Prototype only:** data is kept in the browser's storage, and photos there fill up after roughly 20–40. The example data can be reset from the notes panel beside the phone on desktop. Settings has no reset button.
+- **Prototype only:** data is kept in the browser's storage, and photos there fill up after roughly 20–40. There is no reset button; Settings → Delete all data starts fresh.
 - **Export on the claude.ai link** asks before saving the file. On a normal web host it downloads directly.
 
 ## 8. Still open
