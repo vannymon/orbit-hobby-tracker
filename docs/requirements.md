@@ -25,7 +25,7 @@
 Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details open as bottom sheets.
 
 ### 2.1 Orbit (home)
-- **Header:** "My Orbit", "3 in orbit · 3 resting", and a **+** button. The + asks **An idea** (a title and optional link) or **A hobby** (the New hobby form).
+- **Header:** "My Orbit", "3 in orbit · 3 resting", and a **+** button. The + asks **An idea** (a title and optional notes) or **A hobby** (the New hobby form).
 - **Centre:** the Focus hobby, as the largest bubble with a ring.
 - **Inner ring:** the other hobbies in orbit, as medium bubbles, up to the slot count. Empty slots are dashed circles. Tapping one opens New hobby.
 - **Outer ring:** resting hobbies, as small **grey** bubbles that keep their icon and name. Their colour returns when they come back into orbit. More than 6 collapse into a "+N" bubble.
@@ -37,24 +37,24 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
   - **In orbit:** a row for each other hobby in orbit, showing its next step (or when it was last logged) and a **Log** button.
 
 ### 2.2 Hobby page (tap a bubble, row or card)
-- **Header:** the icon, name, "Last time 4 days ago · 3 logs" (or "Resting 6 weeks"), and a **pencil** at the top right to edit.
+- **Header:** the icon, name, "Last time 4 days ago · 3 logs" (or "Resting 6 weeks"). The count only includes real logs, not rest or idea notes. A **⋮ menu** at the top right has **Edit hobby**, **Start a new goal** and **Make it just for fun** (or **Give it a goal** for a Just for fun hobby).
 - **Status switch:** **Focus · In orbit · Resting**. It shows where the hobby is and changes it in one tap, on the same page. The page keeps its height and the switch stays usable throughout.
-  - **Resting** opens a small panel under the switch with an optional pick-up note and **Rest / Cancel** buttons. Tapping another status cancels it.
+  - **Resting** opens a small panel under the switch with an optional pick-up note and **Rest / Cancel** buttons. A pick-up note is also saved to the Log, tagged **Rested** (van, 16 Oct). The same applies when a hobby rests to make room during a swap. Tapping another status cancels it.
   - **Focus or In orbit on a resting hobby:** it moves in at once if there's a free slot. If the orbit is full, the panel asks which hobby rests to make room.
   - **Focus on a hobby already in orbit:** it becomes the Focus, and the old Focus stays in orbit.
   - **In orbit on the Focus:** it stops being Focus, and nothing becomes Focus automatically.
-- **Goal card:** the goal title and progress dots, then the steps as **checkboxes**. Tap a step to tick or untick it. **Add a step** at the end adds one. Ticking the last open step shows "You did it!" with **Set the next goal** or **Just celebrate for now**. A "Just for fun" hobby shows "No goal. It grows just by doing it." The next step shows under the goal.
+- **Goal card:** edited in place like a note (van, 16 Oct), with no edit button needed. Tap the goal title, any step, or the **Next:** line to type; it saves when you tap away or press Return. Each step has a **checkbox** to tick or untick it. Clearing a step's text removes it, with Undo. **Add a step** at the end adds one. Renaming the goal keeps the logs linked to it. Ticking the last open step shows "You did it!" with **Set the next goal** or **Just celebrate for now**. A "Just for fun" hobby shows "No goal. It grows just by doing it." The editable **Next:** line shows under the goal.
 - **Past goals (van, 16 Oct):** setting a new goal, or switching to Just for fun, never deletes the old one. It moves to a **Past goals** list above the Log, marked ✓ Finished (all steps ticked) or ○ Set aside, with its date and "3 of 3 steps". Tap to see its steps. Logs are always kept. Each log also remembers the goal it was made under, shown in grey when that's no longer the current goal.
 - **Log:** a "Log" heading with a small **+ Add new log** button beside it. Logs are newest first, each with its date, note and photo thumbnails. Tapping a photo shows it full size.
 - **Bottom:** small links **Archive hobby** and then **Delete hobby**. There are no big action buttons on this page.
 
-### 2.3 Edit hobby (pencil)
+### 2.3 Edit hobby (⋮ menu)
 - Name, icon (about 40 in the app, 12 in the prototype), colour, **Has a goal / Just for fun**, the goal ("What would done look like?") and the next step.
 - Rewording a goal keeps its ticked steps. Switching to Just for fun clears the goal and steps.
 
 ### 2.4 New hobby and new idea
 - **New hobby:** name, icon, colour, Has a goal / Just for fun, the goal, the first small step, and **Put it: In orbit / Resting**. If the orbit is full, it goes to Resting with a note saying so. A vague goal such as "get better" gets a gentle hint.
-- **New idea:** a title (required) and a link (optional).
+- **New idea:** a title (required) and notes (optional, several lines, links can go here). When an idea is started as a hobby, its notes become the first entry in the hobby's Log, tagged **From your idea**.
 - **Start it** on an idea opens New hobby prefilled with the idea's title. The idea is removed once the hobby is saved.
 
 ### 2.5 Log sheet
@@ -74,11 +74,11 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 - **Summary tiles:** in orbit (for example 3/3), resting, ideas, archived.
 - **Activity · last 30 days:** every hobby ranked by how many logs it had in the last 30 days, each with a bar in its colour and its count. Above the list is the total ("5 logs across 4 hobbies"). Hobbies with nothing logged show 0 at the bottom, and resting bars are faded. Tap a row to open the hobby. *Deliberate exception to rule 5: check it in user testing.*
 - **Your hobbies** with **+ Add Hobbies** beside the heading: one card per hobby, with Focus first, then in orbit, then resting (greyed). A card shows the state, goal progress ("2 of 4 steps" or "Just for fun"), up to 3 recent photos and the latest log with its note. Tap the card for the hobby page, or a photo to see it full size. Cards have no buttons on them.
-- **Ideas** with **+ Add Ideas** beside the heading: the same card style, with a bulb icon, the title and "Idea · added 3 days ago". The section always shows, with "No ideas yet." when empty. Tap a card for the idea page.
+- **Ideas** with **+ Add Ideas** beside the heading: the same card style, with a bulb icon, the title, "Idea · added 3 days ago" and the first line of its notes. The section always shows, with "No ideas yet." when empty. Tap a card for the idea page.
 
 ### 2.8 Idea page
-- **Header:** a bulb icon, the title, when it was added, and a **pencil** to edit the title and link.
-- The link, if there is one.
+- **Header:** a bulb icon, the title and when it was added. The title is edited in place.
+- **Notes:** a free-text box edited in place, like a notes app, that saves when you tap away. Old ideas with a link have it moved into their notes.
 - **"Ready to try it?"** with **Start it** (see 2.4).
 - **Bottom:** small links **Archive idea** and then **Delete idea**.
 - **Still curious?** (planned, not in the prototype): an idea older than 30 days occasionally shows on Orbit as the one surfacing card, with no day count.
@@ -95,7 +95,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
   - **Export logs (CSV):** one row per log, with hobby, status, date, note and photo count.
   - Both exports show a preview with **Download** and **Copy**.
   - **Delete all data:** a confirm screen with **Export first** offered. It can't be undone.
-- **About:** **Privacy policy** and **Help and support**, which uses a placeholder email until launch.
+- **About:** **Privacy policy** and **Help and support**, which links to vanonghuijuan@gmail.com.
 
 ## 3. Features (v1.0)
 
@@ -109,7 +109,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 | Trial window | ✅ | "Is this for you?" with keep / rest / let go, and one extension. Started from the edit sheet. *Not in the prototype yet.* |
 | Logging with photos | ✅ | Up to 3 photos per log (2.5). |
 | Ideas | ✅ | Own section, own page, Start it, archive, delete (2.7, 2.8). |
-| Edit hobby or idea | ✅ | Pencil on the hobby or idea page only, not on cards. |
+| Edit hobby or idea | ✅ | Goals, steps, Next and ideas are edited in place. Whole-hobby edits are in the ⋮ menu on the hobby page, not on cards. |
 | Archive + restore | ✅ | Hobbies and ideas, from their pages. Restore from Settings → Archive. |
 | Delete hobby or idea | ✅ | Hobby: a confirm sheet saying how many logs and photos go, with "Archive instead". Both have Undo. |
 | Hobbies tab: tiles, activity, cards | ✅ | 2.7 |
@@ -130,8 +130,8 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 
 - **Hobby:** `id, name, icon, tint, status ('play' | 'resting'), focus, goal, logs[], restedAt, pickup, keeps, hasEnd, finished`. Add `icon` and `tint`, and remove `flameName` and the flame art fields.
 - **Goal:** `kind ('goal' | 'just_for_fun'), title, next, steps[] {text, done}`. Hobby also keeps `pastGoals[] {title, steps, done, endedAt}`.
-- **Log:** `at, note, photos[], goal` (the goal title at the time). Photos are file paths in the app. Drop `kind` and `snack`.
-- **Idea:** `id, title, link, addedAt`.
+- **Log:** `at, note, photos[], goal` (the goal title at the time), plus an optional `kind` (`'rest'` for a pick-up note, `'idea'` for notes carried over from an idea). Entries with a kind are not counted as activity. Photos are file paths in the app. Drop the old `kind` values and `snack`.
+- **Idea:** `id, title, notes, addedAt`.
 - **Archived** hobbies and ideas are kept in their own lists so they can be restored.
 - **Settings:** `slots, weekly {on, day, time}, theme ('system' | 'light' | 'dark')`.
 - **Drop:** growth points, stages, moods, accessories and the time-of-day scene.

@@ -147,7 +147,7 @@ h1{font-size:30px;font-weight:800;letter-spacing:-.6px;margin:0}
 .stepper button{width:34px;height:34px;border-radius:50%;background:var(--card);font-size:18px;font-weight:700}
 .big{display:flex;gap:12px;align-items:center}
 .hint{font-size:12.5px;color:var(--soft);line-height:1.4}
-.logitem{padding:10px 0;border-bottom:1px solid var(--line)}
+.logitem{padding:10px 0;border-bottom:1px solid var(--line);white-space:pre-wrap}
 .logitem:last-child{border-bottom:0}
 .thumbs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;flex:none;background:var(--card);padding:0;position:relative}
@@ -188,6 +188,13 @@ h1{font-size:30px;font-weight:800;letter-spacing:-.6px;margin:0}
 select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:0;border-radius:10px;padding:7px 10px}
 .prose{font-size:14.5px;line-height:1.5}.prose p{margin:0 0 10px}
 .pastgoal{border-bottom:1px solid var(--line)}.pastgoal summary{display:flex;gap:10px;align-items:center;padding:8px 0;cursor:pointer;list-style:none}.pastgoal summary::-webkit-details-marker{display:none}
+.inl{width:100%;border:0;background:none;font:inherit;color:var(--ink);padding:3px 0;border-radius:6px;resize:none;display:block}.inl::placeholder{color:var(--faint)}.inl:focus{outline:none;background:var(--line);box-shadow:0 0 0 4px var(--line)}
+.inl.gt{font-weight:700;font-size:15px;margin-top:4px}.chk .inl{flex:1;font-size:14px}.chk.on .inl{color:var(--soft);text-decoration:line-through;text-decoration-color:var(--faint)}
+.chk .box{cursor:pointer}.nextrow{display:flex;gap:6px;align-items:baseline;margin-top:8px;font-size:14px}.nextrow .inl{flex:1;font-size:14px}
+.kebab{position:relative}.menu{position:absolute;right:0;top:38px;z-index:5;min-width:200px;background:var(--screen);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;display:grid}
+.menu button{text-align:left;padding:10px 12px;border-radius:9px;font-size:14.5px;color:var(--ink)}.menu button:hover{background:var(--line)}
+.ltag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--soft);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:4px}
+.inl.it{font-size:20px;font-weight:700}.inl.notes{font-size:14.5px;line-height:1.45;min-height:72px}
 .pg-ic{width:20px;text-align:center;color:var(--soft);font-weight:700}.goaltag{color:var(--soft);font-style:italic}
 .loghead{display:flex;justify-content:space-between;align-items:center;margin:20px 0 4px}
 .seg.state button.on{font-weight:700}
@@ -229,6 +236,7 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
  <symbol id="ui-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></symbol>
  <symbol id="ui-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></symbol>
  <symbol id="ui-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+ <symbol id="ui-kebab" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></symbol>
  <symbol id="ui-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
 </svg>
 
@@ -291,7 +299,8 @@ function seed(){
 }
 let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S||!S.hobbies) S=seed();
-S.archivedIdeas=S.archivedIdeas||[]; S.prefs=Object.assign({weekly:true,day:'Sunday',time:'18:00',theme:'system'},S.prefs||{});
+S.archivedIdeas=S.archivedIdeas||[];
+[...S.ideas,...S.archivedIdeas].forEach(i=>{ if(i.link&&!i.notes) i.notes=i.link; delete i.link; }); S.prefs=Object.assign({weekly:true,day:'Sunday',time:'18:00',theme:'system'},S.prefs||{});
 const applyTheme=()=>{ const r=document.documentElement; if(S.prefs.theme==='system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme',S.prefs.theme); };
 applyTheme();
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}};
@@ -302,7 +311,11 @@ const H=id=>S.hobbies.find(h=>h.id===id);
 const inPlay=()=>S.hobbies.filter(h=>h.status==='play');
 const resting=()=>S.hobbies.filter(h=>h.status==='resting').sort((a,b)=>Date.parse(a.restedAt)-Date.parse(b.restedAt));
 const focus=()=>inPlay().find(h=>h.focus);
-const lastLog=h=>h.logs.length?Math.max(...h.logs.map(l=>Date.parse(l.at))):null;
+// Rest notes and idea notes live in the log as entries with a kind; they are not activity.
+const acts=h=>h.logs.filter(l=>!l.kind);
+const lastLog=h=>acts(h).length?Math.max(...acts(h).map(l=>Date.parse(l.at))):null;
+const KIND={rest:'Rested',idea:'From your idea'};
+function restLog(h,note){ if(note) h.logs.unshift({at:new Date().toISOString(),note,photos:[],kind:'rest'}); }
 function since(ts){ if(!ts) return 'Not logged yet'; const d=Math.floor((Date.now()-ts)/DAY);
   return d<=0?'Last time today':d===1?'Last time yesterday':d<14?`Last time ${d} days ago`:`Last time ${Math.round(d/7)} weeks ago`; }
 function restFor(h){ const d=Math.floor((Date.now()-Date.parse(h.restedAt))/DAY); return d<14?`Resting ${Math.max(d,1)} day${d>1?'s':''}`:`Resting ${Math.round(d/7)} weeks`; }
@@ -422,12 +435,12 @@ function renderIdeas(){
     <div class="loghead"><span class="label" style="margin:0">Your hobbies</span><button class="pill" data-act="add">+ Add Hobbies</button></div>
     ${order.map(hcard).join('')||'<div class="empty-note">No hobbies yet.</div>'}
     <div class="loghead"><span class="label" style="margin:0">Ideas</span><button class="pill" data-act="newidea">+ Add Ideas</button></div>
-    ${S.ideas.length?S.ideas.map(i=>`<div class="hcard"><button class="hhead" data-act="openidea" data-id="${i.id}"><span class="dot idea" style="width:36px;height:36px"><svg class="ic" width="17" height="17"><use href="#ui-bulb"/></svg></span><span class="grow"><span class="t" style="display:block">${esc(i.title)}</span><span class="s">Idea · added ${addedAgo(i.at)}</span></span></button></div>`).join(''):'<div class="empty-note">No ideas yet.</div>'}`;
+    ${S.ideas.length?S.ideas.map(i=>`<div class="hcard"><button class="hhead" data-act="openidea" data-id="${i.id}"><span class="dot idea" style="width:36px;height:36px"><svg class="ic" width="17" height="17"><use href="#ui-bulb"/></svg></span><span class="grow"><span class="t" style="display:block">${esc(i.title)}</span><span class="s">Idea · added ${addedAgo(i.at)}</span></span></button>${i.notes?`<div class="lastlog s">${esc(i.notes.split('\n')[0])}</div>`:''}</div>`).join(''):'<div class="empty-note">No ideas yet.</div>'}`;
 }
 function addedAgo(at){ const d=Math.floor((Date.now()-Date.parse(at))/DAY); return d<=0?'today':d===1?'yesterday':d<14?`${d} days ago`:d<60?`${Math.round(d/7)} weeks ago`:`${Math.round(d/30)} months ago`; }
 // Activity: every hobby ranked by logs in the last 30 days (van chose the full ranking, 16 Oct).
 function lately(){
-  const cut=Date.now()-30*DAY, n=h=>h.logs.filter(l=>Date.parse(l.at)>=cut).length;
+  const cut=Date.now()-30*DAY, n=h=>acts(h).filter(l=>Date.parse(l.at)>=cut).length;
   const act=S.hobbies.map(h=>({h,c:n(h)})).sort((a,b)=>b.c-a.c||(lastLog(b.h)||0)-(lastLog(a.h)||0));
   if(!act.length) return '';
   const max=Math.max(1,...act.map(x=>x.c)), total=act.reduce((t,x)=>t+x.c,0);
@@ -445,7 +458,7 @@ function hcard(h){
   return `<div class="hcard${h.status==='resting'?' resting':''}">
     <div class="top"><button class="hhead" data-act="open" data-id="${h.id}">${dotIcon(h,36)}<span class="grow"><span class="t" style="display:block">${esc(h.name)}</span><span class="s">${state}${prog?' · '+prog:''}</span></span>${msDots(g)}</button></div>
     ${pics.length?`<div class="thumbs">${pics.map(p=>`<button class="thumb" data-act="viewlog" data-from="glance" data-id="${h.id}" data-li="${p.li}" data-pi="${p.pi}" aria-label="Open photo from ${fmtDate(p.l.at)}"><img src="${p.src}" alt=""></button>`).join('')}</div>`:''}
-    <div class="lastlog s">${last?`<b>${fmtDate(last.at)}</b> ${last.note?esc(last.note):'Logged'}`:'Nothing logged yet'}</div>
+    <div class="lastlog s">${last?`<b>${fmtDate(last.at)}</b> ${last.kind?KIND[last.kind]+': ':''}${last.note?esc(last.note):'Logged'}`:'Nothing logged yet'}</div>
   </div>`;
 }
 function sheetDelete(id){
@@ -460,10 +473,10 @@ function sheetDelete(id){
 function sheetIdeaPage(id){
   const i=S.ideas.find(x=>x.id===id); if(!i) return closeSheet();
   openSheet(`
-    <div class="big"><span class="dot idea" style="width:56px;height:56px"><svg class="ic" width="26" height="26"><use href="#ui-bulb"/></svg></span><div style="flex:1;min-width:0"><div class="t" style="font-size:20px">${esc(i.title)}</div><div class="s">Idea · added ${addedAgo(i.at)}</div></div><button class="editbtn" data-act="editidea" data-id="${id}" aria-label="Edit idea ${esc(i.title)}"><svg class="ic" width="17" height="17"><use href="#ui-pencil"/></svg></button></div>
-    ${i.link?`<div class="card" style="margin-top:14px;overflow-wrap:anywhere"><div class="s" style="font-weight:700">LINK</div><div style="font-size:14px;margin-top:4px">${esc(i.link)}</div></div>`:''}
+    <div class="big"><span class="dot idea" style="width:56px;height:56px"><svg class="ic" width="26" height="26"><use href="#ui-bulb"/></svg></span><div style="flex:1;min-width:0"><input class="inl it" data-f="ideatitle" data-id="${id}" value="${esc(i.title)}" aria-label="Idea name" autocomplete="off"><div class="s">Idea · added ${addedAgo(i.at)}</div></div></div>
+    <div class="card" style="margin-top:14px"><div class="s" style="font-weight:700">NOTES</div><textarea class="inl notes" data-f="ideanotes" data-id="${id}" rows="3" placeholder="Why it appeals, where to start, links, anything" aria-label="Notes">${esc(i.notes)}</textarea></div>
     <div class="card" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span><span class="t" style="font-size:15px;display:block">Ready to try it?</span><span class="s">It becomes a hobby you can log.</span></span><button class="pill" data-act="promote" data-id="${id}">Start it</button></div>
-    <div class="endlinks"><button class="dellink" data-act="archiveidea" data-id="${id}">Archive idea</button><button class="dellink" data-act="letgo" data-id="${id}">Delete idea</button></div>`);
+    <div class="endlinks"><button class="dellink" data-act="archiveidea" data-id="${id}">Archive idea</button><button class="dellink" data-act="letgo" data-id="${id}">Delete idea</button></div>`,()=>{ const n=$('#sheet textarea.notes'); n.style.height=n.scrollHeight+'px'; });
 }
 function sheetNew(){
   openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Add something new</b><span style="width:44px"></span></div>
@@ -476,9 +489,9 @@ function sheetIdea(editId){
   const ed=editId?S.ideas.find(i=>i.id===editId):null;
   openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>${ed?'Edit idea':'New idea'}</b><span style="width:44px"></span></div>
     <form id="ideaForm" class="stack" style="margin-top:8px"><input class="field" id="ideaIn" placeholder="e.g. Try a pottery wheel class" autocomplete="off" aria-label="Idea" value="${esc(ed?.title)}">
-      <input class="field" id="ideaLink" placeholder="Link (optional)" autocomplete="off" aria-label="Link" value="${esc(ed?.link)}"><button class="btn">Save idea</button></form>`,()=>{
+      <textarea class="field" id="ideaNotes" rows="4" placeholder="Notes (optional): why it appeals, where to start, links" aria-label="Notes">${esc(ed?.notes)}</textarea><button class="btn">Save idea</button></form>`,()=>{
     $('#ideaForm').onsubmit=e=>{e.preventDefault(); const v=$('#ideaIn').value.trim(); if(!v) return $('#ideaIn').focus();
-      if(ed){ ed.title=v; ed.link=$('#ideaLink').value.trim(); } else S.ideas.unshift({id:uid(),title:v,link:$('#ideaLink').value.trim(),at:new Date().toISOString()});
+      if(ed){ ed.title=v; ed.notes=$('#ideaNotes').value.trim(); } else S.ideas.unshift({id:uid(),title:v,notes:$('#ideaNotes').value.trim(),at:new Date().toISOString()});
       save(); closeSheet(); renderIdeas(); toast(ed?'Idea updated':'Idea saved');};
   });
 }
@@ -512,7 +525,7 @@ function renderSettings(){
     <div class="label">About</div>
     <button class="line linkline" data-act="about" data-k="privacy"><span>Privacy policy</span><span class="s">›</span></button>
     <button class="line linkline" data-act="about" data-k="support"><span>Help and support</span><span class="s">›</span></button>
-    <div class="s" style="text-align:center;margin-top:18px">My Orbit · prototype</div>
+    <div class="s" style="text-align:center;margin-top:18px">My Orbit · V0.1</div>
   `;
   $('#v-settings').querySelectorAll('select.pick').forEach(el=>el.onchange=()=>{ S.prefs[el.dataset.pref]=el.value; save(); renderSettings(); toast('Check-in updated'); });
 }
@@ -542,7 +555,7 @@ function sheetAbout(k){
   const body=k==='privacy'?`<p>My Orbit keeps everything on your phone: hobbies, goals, logs, photos and ideas. There's no account, and nothing is sent to us or anyone else.</p>
     <p>We don't use analytics or ads. If the app crashes, an anonymous crash report (no hobby content) helps us fix it.</p>
     <p>Deleting the app or using "Delete all data" removes everything. Your phone's own iCloud backup may include the app's data, as with any app.</p>`
-   :`<p>Questions, bugs or ideas? Email <b>support@[your domain]</b> and a real person will reply.</p><p>Tip: export a backup from Settings before changing phones.</p><p class="s">The support address is a placeholder until launch.</p>`;
+   :`<p>Questions, bugs or ideas? Email <a href="mailto:vanonghuijuan@gmail.com" style="color:inherit;font-weight:700">vanonghuijuan@gmail.com</a> and a real person will reply.</p><p>Tip: export a backup from Settings before changing phones.</p>`;
   openSheet(`<div class="sheetbar"><button data-act="close" class="s">Close</button><b>${k==='privacy'?'Privacy policy':'Help and support'}</b><span style="width:44px"></span></div><div class="prose">${body}</div>`);
 }
 
@@ -600,30 +613,30 @@ function sheetGoalHit(id){
 function sheetHobby(id,pending){
   const h=H(id), g=h.goal;
   openSheet(`
-    <div class="big">${dotIcon(h,56)}<div style="flex:1"><div class="t" style="font-size:20px">${esc(h.name)}</div><div class="s">${h.status==='play'?since(lastLog(h)):restFor(h)} · ${h.logs.length} log${h.logs.length===1?'':'s'}</div></div><button class="editbtn" data-act="edithobby" data-id="${id}" aria-label="Edit ${esc(h.name)}"><svg class="ic" width="17" height="17"><use href="#ui-pencil"/></svg></button></div>
+    <div class="big">${dotIcon(h,56)}<div style="flex:1"><div class="t" style="font-size:20px">${esc(h.name)}</div><div class="s">${h.status==='play'?since(lastLog(h)):restFor(h)} · ${acts(h).length} log${acts(h).length===1?'':'s'}</div></div><div class="kebab"><button class="editbtn" data-act="kebab" data-id="${id}" aria-label="More for ${esc(h.name)}" aria-haspopup="menu"><svg class="ic" width="19" height="19"><use href="#ui-kebab"/></svg></button></div></div>
     <div class="seg state" role="radiogroup" aria-label="Where ${esc(h.name)} is" style="margin-top:14px">
       ${[['focus','Focus'],['play','In orbit'],['rest','Resting']].map(([k,l])=>{ const on=pending?k===pending:k==='focus'?h.focus:k==='play'?(h.status==='play'&&!h.focus):h.status==='resting';
         return `<button role="radio" aria-checked="${on}" class="${on?'on':''}" data-act="setstate" data-id="${id}" data-s="${k}">${l}</button>`; }).join('')}
     </div>
     ${statePanel(h,pending)}
     <div class="card" style="margin-top:12px">
-      ${g.kind==='goal'?`<div class="cardhead"><span class="s" style="font-weight:700">GOAL</span>${msDots(g)}</div><div class="t" style="font-size:15px;margin-top:4px">${esc(g.title)}</div>
+      ${g.kind==='goal'?`<div class="cardhead"><span class="s" style="font-weight:700">GOAL</span>${msDots(g)}</div><input class="inl gt" data-f="gtitle" data-id="${id}" value="${esc(g.title==='Decide later'?'':g.title)}" placeholder="What would done look like?" aria-label="Goal" autocomplete="off">
         <div class="checks" style="margin-top:8px">${g.ms.map((m,i)=>chk(id,m,i)).join('')}
-          <form class="addstep" data-id="${id}"><span class="box add">+</span><input class="stepin" placeholder="Add a step" aria-label="Add a step to ${esc(g.title)}" autocomplete="off"></form></div>`:`<div class="t" style="font-size:15px">Just for fun</div><div class="s">No goal. It grows just by doing it.</div>`}
-      ${g.next?`<div style="margin-top:10px;font-size:14px">Next: ${esc(g.next)}</div>`:''}
+          <form class="addstep" data-id="${id}"><span class="box add">+</span><input class="stepin" placeholder="Add a step" aria-label="Add a step" autocomplete="off"></form></div>`:`<div class="t" style="font-size:15px">Just for fun</div><div class="s">No goal. It grows just by doing it.</div>`}
+      <div class="nextrow"><span class="s">Next:</span><input class="inl" data-f="next" data-id="${id}" value="${esc(g.next)}" placeholder="a small next step" aria-label="Next step" autocomplete="off"></div>
     </div>
     ${(h.pastGoals||[]).length?`<div class="label">Past goals</div>${h.pastGoals.map(pg=>{ const n=pg.ms.filter(m=>m.d).length;
       return `<details class="pastgoal"><summary><span class="pg-ic">${pg.done?'✓':'○'}</span><span class="grow"><span class="t" style="display:block;font-size:14.5px">${esc(pg.title)}</span><span class="s">${pg.done?'Finished':'Set aside'} ${fmtDate(pg.endedAt)}${pg.ms.length?` · ${n} of ${pg.ms.length} steps`:''}</span></span></summary>
         ${pg.ms.length?`<div class="s" style="padding:4px 0 2px 30px;line-height:1.7">${pg.ms.map(m=>`${m.d?'✓':'○'} ${esc(m.t)}`).join('<br>')}</div>`:''}</details>`; }).join('')}`:''}
     <div class="loghead"><span class="label" style="margin:0">Log</span><button class="pill" data-act="log" data-id="${id}">+ Add new log</button></div>
-    ${h.logs.map((l,li)=>`<div class="logitem"><div class="s">${fmtDate(l.at)}${l.goal&&l.goal!==g.title?` · <span class="goaltag">${esc(l.goal)}</span>`:''}</div>${l.note?`<div style="font-size:14px">${esc(l.note)}</div>`:''}${photosOf(l).length?`<div class="thumbs">${photosOf(l).map((src,pi)=>`<button class="thumb" data-act="viewlog" data-id="${id}" data-li="${li}" data-pi="${pi}" aria-label="Open photo from ${fmtDate(l.at)}"><img src="${src}" alt=""></button>`).join('')}</div>`:''}</div>`).join('')||'<div class="empty-note">Nothing logged yet.</div>'}
+    ${h.logs.map((l,li)=>`<div class="logitem"><div class="s">${fmtDate(l.at)}${l.kind?`<span class="ltag">${KIND[l.kind]}</span>`:''}${l.goal&&l.goal!==g.title?` · <span class="goaltag">${esc(l.goal)}</span>`:''}</div>${l.note?`<div style="font-size:14px">${esc(l.note)}</div>`:''}${photosOf(l).length?`<div class="thumbs">${photosOf(l).map((src,pi)=>`<button class="thumb" data-act="viewlog" data-id="${id}" data-li="${li}" data-pi="${pi}" aria-label="Open photo from ${fmtDate(l.at)}"><img src="${src}" alt=""></button>`).join('')}</div>`:''}</div>`).join('')||'<div class="empty-note">Nothing logged yet.</div>'}
     <div class="endlinks"><button class="dellink" data-act="archive" data-id="${id}">Archive hobby</button><button class="dellink" data-act="delhobby" data-id="${id}">Delete hobby</button></div>
   `);
 }
 
 // Inline step under the status switch, so the page keeps its height and the switch stays usable.
 function statePanel(h,pending){
-  if(pending==='rest') return `<div class="statepanel"><div class="s">It keeps its goal, steps and log. Leave yourself a note for when it comes back.</div>
+  if(pending==='rest') return `<div class="statepanel"><div class="s">It keeps its goal, steps and log. A note you leave here is saved to its log too.</div>
     <input class="field" id="restNote" placeholder="Where you left off (optional)" value="${esc(h.pickup)}" aria-label="Pick-up note">
     <div class="row2"><button class="btn sm" data-act="dorestinline" data-id="${h.id}">Rest ${esc(h.name)}</button><button class="btn sm ghost" data-act="open" data-id="${h.id}">Cancel</button></div></div>`;
   if(pending==='focus'||pending==='play'){ const play=inPlay(), last=play.filter(p=>!p.focus).at(-1)||play.at(-1);
@@ -657,7 +670,7 @@ function sheetSwap(id){
 }
 function doSwap(id){
   const before=JSON.stringify(S), h=H(id), outId=$('#sheet').dataset.pick;
-  if(outId){ const o=H(outId); o.status='resting'; o.restedAt=new Date().toISOString(); o.pickup=($('#pickNote')?.value||'').trim()||o.pickup; if(o.focus){o.focus=false;} }
+  if(outId){ const o=H(outId); o.status='resting'; o.restedAt=new Date().toISOString(); const pn=($('#pickNote')?.value||'').trim(); o.pickup=pn||o.pickup; restLog(o,pn); if(o.focus){o.focus=false;} }
   h.status='play'; h.restedAt=null; h.keeps=0;
   save(); closeSheet(); renderOrbit(); renderSettings(); setTab('orbit');
   toast(`${h.name} is back in orbit`,()=>{S=JSON.parse(before);save();renderAll();});
@@ -713,14 +726,14 @@ function doAdd(){
   const h={id:uid(),name,icon:sh.dataset.icon,tint:sh.dataset.tint,status:where,focus:false,goal:g,logs:[],restedAt:where==='resting'?new Date().toISOString():null,pickup:'',keeps:0};
   if(where==='play'&&!focus()) h.focus=false;
   S.hobbies.push(h);
-  if(sh.dataset.ideaId){ S.ideas=S.ideas.filter(i=>i.id!==sh.dataset.ideaId); }
+  if(sh.dataset.ideaId){ const idea=S.ideas.find(i=>i.id===sh.dataset.ideaId); if(idea?.notes) h.logs.push({at:new Date().toISOString(),note:idea.notes,photos:[],kind:'idea'}); S.ideas=S.ideas.filter(i=>i.id!==sh.dataset.ideaId); }
   save(); closeSheet(); renderAll(); setTab('orbit');
   toast(where!==sh.dataset.where?`Orbit is full, so ${name} is resting for now`:`${name} added`);
 }
-const chk=(id,m,i)=>`<button class="chk${m.d?' on':''}" role="checkbox" aria-checked="${!!m.d}" data-act="togms" data-id="${id}" data-i="${i}"><span class="box">${m.d?'<svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="stroke-width:3.5"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span class="tx">${esc(m.t)}</span></button>`;
+const chk=(id,m,i)=>`<div class="chk${m.d?' on':''}"><button class="box" role="checkbox" aria-checked="${!!m.d}" aria-label="Done: ${esc(m.t)}" data-act="togms" data-id="${id}" data-i="${i}">${m.d?'<svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="stroke-width:3.5"><path d="M5 12l5 5 9-10"/></svg>':''}</button><input class="inl" data-f="step" data-id="${id}" data-i="${i}" value="${esc(m.t)}" aria-label="Step" autocomplete="off"></div>`;
 function togMs(t){
   const h=H(t.dataset.id), g=h.goal, m=g.ms[+t.dataset.i]; m.d=m.d?0:1; save();
-  t.outerHTML=chk(h.id,m,+t.dataset.i);
+  t.closest('.chk').outerHTML=chk(h.id,m,+t.dataset.i);
   const d=$('#sheet .cardhead .dots'); if(d) d.outerHTML=msDots(g);
   renderOrbit(); renderIdeas();
   if(m.d&&g.ms.every(x=>x.d)) setTimeout(()=>sheetGoalHit(h.id),450);
@@ -729,6 +742,29 @@ document.addEventListener('submit',e=>{ const f=e.target.closest('.addstep'); if
   const v=f.querySelector('.stepin').value.trim(); if(!v) return; const h=H(f.dataset.id); h.goal.ms.push({t:v,d:0}); save();
   f.insertAdjacentHTML('beforebegin',chk(h.id,h.goal.ms.at(-1),h.goal.ms.length-1)); f.querySelector('.stepin').value='';
   const d=$('#sheet .cardhead .dots'); if(d) d.outerHTML=msDots(h.goal); renderOrbit(); renderIdeas(); });
+// Inline editing: goal, steps, next step and ideas save when the field loses focus, like a notes app.
+document.addEventListener('keydown',e=>{ const f=e.target; if(e.key==='Enter'&&f.matches('input.inl')){ e.preventDefault(); f.blur(); } });
+document.addEventListener('input',e=>{ const f=e.target; if(f.matches('textarea.inl')){ f.style.height='auto'; f.style.height=f.scrollHeight+'px'; } });
+document.addEventListener('change',e=>{ const f=e.target, k=f.dataset.f; if(!k) return; const v=f.value.trim(), id=f.dataset.id;
+  if(k==='ideatitle'||k==='ideanotes'){ const i=S.ideas.find(x=>x.id===id); if(!i) return;
+    if(k==='ideatitle'){ if(!v){ f.value=i.title; return; } i.title=v; } else i.notes=v;
+    save(); renderIdeas(); return; }
+  const h=H(id); if(!h) return; const g=h.goal;
+  if(k==='gtitle'){ const old=g.title; if(!v){ f.value=old==='Decide later'?'':old; return; } g.title=v; h.logs.forEach(l=>{ if(l.goal===old) l.goal=v; }); }
+  if(k==='next') g.next=v;
+  if(k==='step'){ const i=+f.dataset.i;
+    if(!v){ const before=JSON.stringify(S), t=g.ms[i].t; g.ms.splice(i,1); save(); renderAll(); sheetHobby(id);
+      return toast(`Step removed: ${t}`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);}); }
+    g.ms[i].t=v; }
+  save(); renderOrbit(); renderIdeas();
+});
+function closeMenus(){ document.querySelectorAll('.menu').forEach(m=>m.remove()); }
+function openKebab(t){
+  const open=t.parentElement.querySelector('.menu'); closeMenus(); if(open) return;
+  const h=H(t.dataset.id), id=h.id;
+  t.insertAdjacentHTML('afterend',`<div class="menu" role="menu"><button role="menuitem" data-act="edithobby" data-id="${id}">Edit hobby</button>
+    ${h.goal.kind==='goal'?`<button role="menuitem" data-act="newgoal" data-id="${id}">Start a new goal</button><button role="menuitem" data-act="funmode" data-id="${id}">Make it just for fun</button>`:`<button role="menuitem" data-act="newgoal" data-id="${id}">Give it a goal</button>`}</div>`);
+}
 function sheetEditHobby(id){
   const h=H(id)||S.archived.find(x=>x.id===id), g=h.goal; let icon=h.icon, tint=h.tint, kind=g.kind==='fun'?'fun':'goal';
   openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Edit hobby</b><button data-act="saveedit" data-id="${id}" style="font-weight:700">Save</button></div>
@@ -780,8 +816,11 @@ $('#scrim').onclick=closeSheet;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 
 document.addEventListener('click',e=>{
+  if(!e.target.closest('.menu,[data-act="kebab"]')) closeMenus();
   const t=e.target.closest('[data-act]'); if(!t) return;
   const id=t.dataset.id, a=t.dataset.act;
+  if(a==='kebab') return openKebab(t);
+  if(t.closest('.menu')) closeMenus();
   if(a==='close') return closeSheet();
   if(a==='weekly'){ S.prefs.weekly=!S.prefs.weekly; save(); renderSettings(); return toast(S.prefs.weekly?'Weekly check-in on':'Weekly check-in off'); }
   if(a==='theme'){ S.prefs.theme=t.dataset.k; save(); applyTheme(); return renderSettings(); }
@@ -803,7 +842,7 @@ document.addEventListener('click',e=>{
     return sheetHobby(id); }
   if(a==='pickout'){ const pn=t.closest('.statepanel'); pn.dataset.pick=t.dataset.pick; pn.querySelectorAll('.radio').forEach(r=>r.classList.toggle('on',r.parentElement===t)); return; }
   if(a==='dobringinline') return bringIn(id,t.dataset.s,t.closest('.statepanel').dataset.pick);
-  if(a==='dorestinline'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); h.pickup=$('#restNote').value.trim()||h.pickup; save(); renderAll(); sheetHobby(id); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);}); }
+  if(a==='dorestinline'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); const rn=$('#restNote').value.trim(); h.pickup=rn||h.pickup; restLog(h,rn); save(); renderAll(); sheetHobby(id); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);}); }
   if(a==='togms') return togMs(t);
   if(a==='edithobby') return sheetEditHobby(id);
   if(a==='saveedit') return saveEdit(id);
@@ -825,13 +864,13 @@ document.addEventListener('click',e=>{
   if(a==='pickfocus'){ const p=inPlay()[0]; if(p) return sheetHobby(p.id); return sheetAdd(); }
   if(a==='makefocus'){ S.hobbies.forEach(h=>h.focus=false); H(id).focus=true; save(); closeSheet(); pulseId=id; renderOrbit(); return toast(`${H(id).name} is your Focus`); }
   if(a==='rest') return sheetRest(id);
-  if(a==='dorest'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); h.pickup=$('#restNote').value.trim()||h.pickup; save(); closeSheet(); renderAll(); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='dorest'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); const rn=$('#restNote').value.trim(); h.pickup=rn||h.pickup; restLog(h,rn); save(); closeSheet(); renderAll(); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();}); }
   if(a==='keep'){ const h=H(id); h.restedAt=new Date().toISOString(); h.keeps++; save(); renderAll(); return toast(`${h.name} keeps resting. I'll ask again in 6 weeks.`); }
   if(a==='archive'){ const before=JSON.stringify(S),h=H(id); S.hobbies=S.hobbies.filter(x=>x.id!==id); h.focus=false; S.archived.unshift(h); save(); closeSheet(); renderAll(); return toast(`${h.name} archived`,()=>{S=JSON.parse(before);save();renderAll();}); }
   if(a==='restore'){ const h=S.archived.find(x=>x.id===id); S.archived=S.archived.filter(x=>x.id!==id); h.status='resting'; h.restedAt=new Date().toISOString(); S.hobbies.push(h); save(); renderAll(); return toast(`${h.name} is resting again`); }
   if(a==='newgoal') return sheetNewGoal(id);
-  if(a==='savegoal'){ const h=H(id),v=$('#ngGoal').value.trim(); if(!v) return $('#ngGoal').focus(); retireGoal(h); h.goal={kind:'goal',title:v,next:$('#ngNext').value.trim(),ms:[]}; save(); closeSheet(); renderAll(); return toast('New goal set'); }
-  if(a==='funmode'){ const h=H(id); retireGoal(h); h.goal={kind:'fun',title:'',next:'',ms:[]}; save(); closeSheet(); renderAll(); return toast(`${h.name} is just for fun now`); }
+  if(a==='savegoal'){ const h=H(id),v=$('#ngGoal').value.trim(); if(!v) return $('#ngGoal').focus(); retireGoal(h); h.goal={kind:'goal',title:v,next:$('#ngNext').value.trim(),ms:[]}; save(); renderAll(); sheetHobby(id); return toast('New goal set. The old one is under Past goals'); }
+  if(a==='funmode'){ const h=H(id), before=JSON.stringify(S); retireGoal(h); h.goal={kind:'fun',title:'',next:h.goal.next,ms:[]}; save(); renderAll(); sheetHobby(id); return toast(`${h.name} is just for fun now`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);}); }
   if(a==='promote'){ const i=S.ideas.find(x=>x.id===id); sheetAdd(i.title); $('#sheet').dataset.ideaId=id; return; }
   if(a==='letgo'){ const before=JSON.stringify(S),i=S.ideas.find(x=>x.id===id); S.ideas=S.ideas.filter(x=>x.id!==id); save(); closeSheet(); renderIdeas(); return toast(`Idea deleted`,()=>{S=JSON.parse(before);save();renderIdeas();}); }
   if(a==='slots'){ const n=Math.min(5,Math.max(1,S.slots+ +t.dataset.d)); if(n<inPlay().length) return toast(`Rest a hobby first. ${inPlay().length} are in orbit.`); S.slots=n; save(); renderAll(); return; }
