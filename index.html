@@ -209,9 +209,13 @@ select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);
 .choice{background:var(--card);padding:14px}
 .glance .meta{display:flex;align-items:center;gap:8px;flex:none}
 
-.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--toast);color:var(--toastInk);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
-  font-size:14px;transform:translateY(20px);opacity:0;pointer-events:none;transition:all .25s;z-index:8}
-.toast.on{transform:none;opacity:1;pointer-events:auto}
+/* Toast: drops in from the top like a phone notification, so it never covers the sheet's buttons. Slides back up on its own, or on tap or an upward swipe. */
+.toast{position:absolute;left:12px;right:12px;top:calc(10px + env(safe-area-inset-top,0px));background:var(--toast);color:var(--toastInk);border-radius:18px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.22);transform:translateY(calc(-100% - 24px)) scale(.96);opacity:0;pointer-events:none;z-index:20;touch-action:none;
+  transition:transform .32s cubic-bezier(.4,0,.9,.6),opacity .26s ease-in}
+.toast.on{transform:none;opacity:1;pointer-events:auto;transition:transform .5s cubic-bezier(.2,1.25,.35,1),opacity .2s ease-out}
+.toast.drag{transition:none}
+@media (prefers-reduced-motion:reduce){.toast,.toast.on{transition:opacity .2s;transform:none}}
 .toast button{color:var(--toastInk);font-weight:800;text-decoration:underline}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -810,8 +814,18 @@ function sheetNewGoal(id){
 
 /* ---------- ACTIONS ---------- */
 let undoFn=null, toastT;
-function toast(msg,undo){ $('#toastMsg').textContent=msg; undoFn=undo||null; $('#toastUndo').hidden=!undo; $('#toast').classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>$('#toast').classList.remove('on'),undo?10000:2600); }
-$('#toastUndo').onclick=()=>{ undoFn&&undoFn(); $('#toast').classList.remove('on'); toast('Undone'); };
+const hideToast=()=>{ clearTimeout(toastT); const el=$('#toast'); el.classList.remove('on','drag'); el.style.transform=''; };
+// Plain messages stay 3s, ones with Undo 6s. The timer pauses while a finger or pointer is on it.
+function toast(msg,undo){ const el=$('#toast'); $('#toastMsg').textContent=msg; undoFn=undo||null; $('#toastUndo').hidden=!undo; el.dataset.ms=undo?6000:3000;
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(hideToast,+el.dataset.ms); }
+{ const el=$('#toast'); let y0=null, dy=0;
+  el.addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; clearTimeout(toastT); y0=e.clientY; dy=0; el.classList.add('drag'); el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointermove',e=>{ if(y0===null) return; dy=Math.min(0,e.clientY-y0); el.style.transform=`translateY(${dy}px)`; });
+  el.addEventListener('pointerup',()=>{ if(y0===null) return; y0=null; el.classList.remove('drag'); el.style.transform='';
+    if(dy<-20||Math.abs(dy)<4) hideToast(); else toastT=setTimeout(hideToast,1500); });
+  el.addEventListener('pointercancel',()=>{ y0=null; el.classList.remove('drag'); el.style.transform=''; toastT=setTimeout(hideToast,1500); });
+  el.addEventListener('mouseenter',()=>clearTimeout(toastT)); el.addEventListener('mouseleave',()=>{ if(el.classList.contains('on')) toastT=setTimeout(hideToast,1500); }); }
+$('#toastUndo').onclick=()=>{ undoFn&&undoFn(); toast('Undone'); };
 $('#scrim').onclick=closeSheet;
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 

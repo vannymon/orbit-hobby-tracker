@@ -18,7 +18,7 @@
 4. **Nothing is ever overdue, missed or red.** Time is shown as neutral facts, for example "Last time 4 days ago".
 5. **Size and colour don't rank hobbies on Orbit.** Size marks the Focus, and colour plus icon identify a hobby. The one deliberate exception is the Activity ranking on the Hobbies tab (2.5), which van chose and which needs checking in user testing.
 6. **Logging is one tap.** The note, photos and date are optional.
-7. **Every destructive or moving action can be undone** for 10 seconds (rest, swap, archive, delete). "Delete all data" is the exception: it asks first and can't be undone.
+7. **Every destructive or moving action can be undone** for 6 seconds (rest, swap, archive, delete). Confirmations drop in from the top like a phone notification, so they never cover buttons, and slide away on their own (3 seconds, or 6 with Undo). A tap or an upward swipe dismisses one early (van, 16 Oct). "Delete all data" is the exception: it asks first and can't be undone.
 
 ## 2. Screens
 
@@ -67,7 +67,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 
 ### 2.6 Swap sheet and Welcome back (tap a resting bubble)
 - Shows the pick-up note and next step, with **Bring into orbit**. If the orbit is full, you choose which hobby rests and can leave it a pick-up note.
-- Afterwards there's **Undo** for 10 seconds, and a **Welcome back** sheet shows the last photo, the pick-up note and "Does this goal still fit?" (**Keep it** or **Change goal**).
+- Afterwards there's **Undo** for 6 seconds, and a **Welcome back** sheet shows the last photo, the pick-up note and "Does this goal still fit?" (**Keep it** or **Change goal**).
 
 ### 2.7 Hobbies tab (renamed from Ideas)
 - **Title:** "Hobbies", with the line "Everything at a glance, plus ideas you might try one day."
