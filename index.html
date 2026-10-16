@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+<title>My Orbit prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one phone-sized app column (framed on desktop, full-bleed on phones), tabs pinned to the bottom. */
+:root{
+  --bg:#f3f2f7; --frame:#1c1b22; --screen:#ffffff; --ink:#1c1b22; --soft:#6d6a78; --faint:#a9a6b4;
+  --line:#e8e6ef; --card:#f5f4f9; --btn:#1c1b22; --btnInk:#ffffff; --ring:#1c1b22; --scrim:rgba(20,18,30,.32);
+  --toast:#1c1b22; --toastInk:#ffffff; --rest-bg:#e9e8ee; --rest-ic:#8a8796;
+  --font:"Figtree",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  /* hobby tints: fill / icon */
+  --t-coral:#f8cdbd; --i-coral:#a1351a;
+  --t-violet:#ded3fb; --i-violet:#5530b8;
+  --t-leaf:#d3ebc3; --i-leaf:#2c6a1a;
+  --t-honey:#fbe1ad; --i-honey:#7d5200;
+  --t-sky:#cddcfb; --i-sky:#2546a3;
+  --t-rose:#f8cfe0; --i-rose:#982155;
+  --t-mint:#c5ece2; --i-mint:#14675a;
+  --t-sand:#ebdccb; --i-sand:#6b4a2a;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121118; --frame:#2c2a36; --screen:#1a1922; --ink:#f1f0f6; --soft:#a6a3b3; --faint:#6e6b7a;
+  --line:#2e2c38; --card:#24232e; --btn:#f1f0f6; --btnInk:#1a1922; --ring:#f1f0f6; --scrim:rgba(0,0,0,.55);
+  --toast:#f1f0f6; --toastInk:#1a1922; --rest-bg:#2f2e39; --rest-ic:#9a97a8;
+  --t-coral:#5a3226; --i-coral:#ffc2ad; --t-violet:#3b2f63; --i-violet:#d6c8ff; --t-leaf:#2c4423; --i-leaf:#c6ebb0;
+  --t-honey:#4e3d17; --i-honey:#ffd98f; --t-sky:#25365e; --i-sky:#c4d5ff; --t-rose:#55263a; --i-rose:#ffc4dc;
+  --t-mint:#1d463e; --i-mint:#b4efe0; --t-sand:#43362a; --i-sand:#f1dcc3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121118; --frame:#2c2a36; --screen:#1a1922; --ink:#f1f0f6; --soft:#a6a3b3; --faint:#6e6b7a;
+  --line:#2e2c38; --card:#24232e; --btn:#f1f0f6; --btnInk:#1a1922; --ring:#f1f0f6; --scrim:rgba(0,0,0,.55);
+  --toast:#f1f0f6; --toastInk:#1a1922; --rest-bg:#2f2e39; --rest-ic:#9a97a8;
+  --t-coral:#5a3226; --i-coral:#ffc2ad; --t-violet:#3b2f63; --i-violet:#d6c8ff; --t-leaf:#2c4423; --i-leaf:#c6ebb0;
+  --t-honey:#4e3d17; --i-honey:#ffd98f; --t-sky:#25365e; --i-sky:#c4d5ff; --t-rose:#55263a; --i-rose:#ffc4dc;
+  --t-mint:#1d463e; --i-mint:#b4efe0; --t-sand:#43362a; --i-sand:#f1dcc3; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;gap:40px;justify-content:center;align-items:center;padding-block:24px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+svg.ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.notes{max-width:300px;color:var(--soft);font-size:14px;line-height:1.5}
+.notes h2{color:var(--ink);font-size:22px;margin:0 0 8px;text-wrap:balance}
+.notes ol{padding-left:18px;margin:8px 0 0;display:grid;gap:6px}
+.notes .reset{margin-top:14px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:underline}
+
+.phone{width:390px;height:780px;max-height:calc(100vh - 48px);border-radius:48px;border:10px solid var(--frame);
+  background:var(--screen);position:relative;overflow:hidden;flex:none;display:flex;flex-direction:column}
+@media (max-width:760px){
+  body{padding:0;display:block}
+  .notes{display:none}
+  .phone{width:100%;height:100%;max-height:none;border:0;border-radius:0}
+}
+.view{flex:1;overflow-y:auto;padding:22px 20px 24px}
+.view[hidden],[hidden]{display:none!important}
+.head{display:flex;justify-content:space-between;align-items:flex-start}
+h1{font-size:30px;font-weight:800;letter-spacing:-.6px;margin:0}
+.sub{color:var(--soft);font-size:13px;margin-top:2px}
+.iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card)}
+.label{font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--soft);margin:18px 0 8px}
+
+/* Orbit */
+.orbit{position:relative;height:306px;margin-top:4px}
+.orbit .ring{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);border:1.5px dashed var(--line);pointer-events:none}
+.bub{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bub .disc{border-radius:50%;display:grid;place-items:center;transition:transform .2s}
+.bub:hover .disc{transform:scale(1.05)}
+.bub .nm{font-size:11px;font-weight:600;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}
+.bub.resting .nm{color:var(--soft);font-weight:500}
+.bub.focus .disc{box-shadow:0 0 0 3px var(--screen),0 0 0 5.5px var(--ring)}
+.bub.empty .disc{border:1.5px dashed var(--faint);color:var(--faint)}
+.bub.more .disc{background:var(--card);color:var(--soft);font-weight:700;font-size:12px}
+.pulse .disc{animation:pulse .7s ease-out}
+@keyframes pulse{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
+@keyframes drift{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.bub.resting .disc{animation:drift 6s ease-in-out infinite;background:var(--rest-bg)!important;color:var(--rest-ic)!important}
+.dot.rest{background:var(--rest-bg)!important;color:var(--rest-ic)!important}
+.bub.waking .disc{transition:background .6s,color .6s}
+
+.card{background:var(--card);border-radius:18px;padding:14px}
+.cardhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.t{font-weight:700;font-size:16px}
+.s{color:var(--soft);font-size:12.5px}
+.next{font-size:14.5px;margin:6px 0 12px;line-height:1.35}
+.dots{display:flex;gap:4px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--ink)}.dots i.o{background:var(--line)}
+.btn{display:block;width:100%;background:var(--btn);color:var(--btnInk);border-radius:14px;padding:13px;font-weight:700;text-align:center}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.sm{width:auto;padding:8px 12px;font-size:13px;border-radius:11px}
+.row{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:10px 12px;margin-bottom:8px;width:100%;text-align:left}
+.dot{border-radius:50%;display:grid;place-items:center;flex:none}
+.row .grow{flex:1;min-width:0}
+.row .grow .t{font-size:14.5px}
+.pill{font-size:12px;font-weight:700;border:1.5px solid var(--line);border-radius:10px;padding:6px 11px;background:var(--screen)}
+.surf{border:1.5px solid var(--line);background:var(--screen)}
+.surf .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.empty-note{color:var(--soft);font-size:13.5px;text-align:center;padding:10px 0}
+
+/* Tabs */
+.tabs{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--screen)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--faint);font-weight:600;min-width:70px}
+.tab[aria-selected="true"]{color:var(--ink)}
+
+/* Sheets */
+.scrim{position:absolute;inset:0;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--screen);border-radius:24px 24px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom,0px));
+  transform:translateY(105%);transition:transform .28s cubic-bezier(.3,.7,.3,1);z-index:6;max-height:88%;overflow-y:auto}
+.sheet.on{transform:none}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheetbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:14.5px}
+.sheetbar b{font-size:16px}
+.field{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:11px 12px;font:inherit;font-size:14.5px;color:var(--ink);background:var(--screen);resize:none}
+.field::placeholder{color:var(--faint)}
+.stack{display:grid;gap:10px}
+.line{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px;gap:10px}
+.switch{width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch[aria-checked="true"]{background:var(--btn)}.switch[aria-checked="true"]::after{left:21px}
+.radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--faint);flex:none}
+.radio.on{border:6px solid var(--ink)}
+.quote{font-style:italic;font-size:15px;line-height:1.4}
+.grid-icons{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.grid-icons button{aspect-ratio:1;border-radius:14px;display:grid;place-items:center;background:var(--card);border:2px solid transparent}
+.grid-icons button.on{border-color:var(--ink)}
+.tints{display:flex;gap:8px;flex-wrap:wrap}
+.tints button{width:32px;height:32px;border-radius:50%;border:2px solid transparent}
+.tints button.on{box-shadow:0 0 0 2px var(--screen),0 0 0 4px var(--ink)}
+.seg{display:flex;background:var(--card);border-radius:12px;padding:3px}
+.seg button{flex:1;padding:8px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--soft)}
+.seg button.on{background:var(--screen);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.stepper{display:flex;align-items:center;gap:12px}
+.stepper button{width:34px;height:34px;border-radius:50%;background:var(--card);font-size:18px;font-weight:700}
+.big{display:flex;gap:12px;align-items:center}
+.hint{font-size:12.5px;color:var(--soft);line-height:1.4}
+.logitem{padding:10px 0;border-bottom:1px solid var(--line)}
+.logitem:last-child{border-bottom:0}
+.thumbs{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;flex:none;background:var(--card);padding:0;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .x{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;line-height:20px;text-align:center}
+.addphoto{width:64px;height:64px;border-radius:10px;border:1.5px dashed var(--faint);color:var(--soft);display:grid;place-items:center;flex:none}
+.viewer img{width:100%;border-radius:14px;display:block;max-height:60vh;object-fit:contain;background:var(--card)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.tile{background:var(--card);border-radius:14px;padding:10px 6px;text-align:center}
+.tile b{display:block;font-size:22px;font-weight:800;letter-spacing:-.4px}
+.tile span{font-size:11.5px;color:var(--soft)}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip .thumb{width:84px;height:84px;border-radius:12px}
+.strip .thumb .tag{position:absolute;left:4px;bottom:4px}
+.hcard{background:var(--card);border-radius:18px;padding:12px;margin-bottom:10px}
+.hcard>.top{display:flex;align-items:center;gap:6px}
+.editbtn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--soft);flex:none}
+.editbtn:hover{background:var(--line);color:var(--ink)}
+.hhead{flex:1;min-width:0;display:flex;align-items:center;gap:12px;width:100%;text-align:left}
+.hhead .grow{flex:1;min-width:0}.hhead .t{font-size:15px}
+.hcard .thumbs{margin-top:10px}.hcard .thumb{width:72px;height:72px}
+.lastlog{margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lastlog b{color:var(--ink);font-weight:600;margin-right:4px}
+.hcard.resting .hhead .t{color:var(--soft)}
+.dot.idea{background:var(--screen);color:var(--soft);border:1.5px dashed var(--faint)}
+.activity{padding:12px 14px}
+.checks{display:grid;gap:2px}
+.chk{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 0;font-size:14px}
+.box{width:22px;height:22px;border-radius:7px;border:2px solid var(--faint);display:grid;place-items:center;flex:none;color:var(--btnInk)}
+.chk.on .box{background:var(--btn);border-color:var(--btn)}
+.chk.on .tx{color:var(--soft);text-decoration:line-through;text-decoration-color:var(--faint)}
+.addstep{display:flex;align-items:center;gap:10px;padding:5px 0}
+.box.add{border-style:dashed;color:var(--soft);font-weight:700}
+.stepin{flex:1;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);padding:4px 0}.stepin::placeholder{color:var(--faint)}.stepin:focus-visible{outline:none}.addstep:focus-within .box.add{border-color:var(--ink);color:var(--ink)}
+.statepanel{display:grid;gap:10px;margin-top:10px;padding:12px;border:1.5px solid var(--line);border-radius:16px}
+.statepanel .row2{display:flex;gap:8px}.statepanel .pickrow{padding:8px 0}
+.linkline{width:100%;text-align:left}
+select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:0;border-radius:10px;padding:7px 10px}
+.prose{font-size:14.5px;line-height:1.5}.prose p{margin:0 0 10px}
+.loghead{display:flex;justify-content:space-between;align-items:center;margin:20px 0 4px}
+.seg.state button.on{font-weight:700}
+.endlinks{display:grid;gap:14px;margin:24px 0 4px}
+.dellink{display:block;margin:0 auto;font-size:13.5px;font-weight:600;color:var(--soft);text-decoration:underline}
+.arow{display:flex;align-items:center;gap:8px;width:100%;padding:5px 0;text-align:left}
+.arow .rk{width:14px;font-size:12px;color:var(--soft);font-weight:700;text-align:right}
+.arow .nm{width:96px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arow .bar{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}.arow .bar i{display:block;height:100%;border-radius:4px}
+.arow .n{width:18px;text-align:right;font-size:13px;font-weight:700}
+.cta{margin-top:18px;text-align:center;background:var(--screen);border:1.5px solid var(--line)}
+.choice{background:var(--card);padding:14px}
+.glance .meta{display:flex;align-items:center;gap:8px;flex:none}
+
+.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--toast);color:var(--toastInk);border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;
+  font-size:14px;transform:translateY(20px);opacity:0;pointer-events:none;transition:all .25s;z-index:8}
+.toast.on{transform:none;opacity:1;pointer-events:auto}
+.toast button{color:var(--toastInk);font-weight:800;text-decoration:underline}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="5.5" cy="16" r="3.5"/><circle cx="18.5" cy="16" r="3.5"/><path d="M5.5 16l4-7h6l3 7M9.5 9l3 7h-7M14 6h3"/></symbol>
+ <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7l1.5-2.5h4L15.5 7"/></symbol>
+ <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-1.5-1-2.5 1-1.5 2-1.5h2a4 4 0 0 0 4-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+ <symbol id="i-pot" viewBox="0 0 24 24"><path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"/></symbol>
+ <symbol id="i-guitar" viewBox="0 0 24 24"><path d="M14 10l6-6M18 2l4 4"/><path d="M14 10a4 4 0 0 0-5.5-.5L4 14a4 4 0 0 0 6 6l4.5-4.5A4 4 0 0 0 14 10z"/><circle cx="9" cy="15" r="1.5"/></symbol>
+ <symbol id="i-needle" viewBox="0 0 24 24"><path d="M4 20L18 6"/><ellipse cx="19.5" cy="4.5" rx="1.6" ry="1" transform="rotate(-45 19.5 4.5)"/><path d="M14 4c-5 0-9 3-9 8"/></symbol>
+ <symbol id="i-plant" viewBox="0 0 24 24"><path d="M12 20v-8M12 12c0-4 3-7 7-7 0 4-3 7-7 7zM12 14c0-3-2.5-5.5-6-5.5 0 3 2.5 5.5 6 5.5z"/><path d="M7 20h10"/></symbol>
+ <symbol id="i-run" viewBox="0 0 24 24"><circle cx="14" cy="4.5" r="1.8"/><path d="M6 21l3-5 3 2 1-5 3 3h3M9 11l3-3 3 1 1 3"/></symbol>
+ <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+ <symbol id="i-climb" viewBox="0 0 24 24"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="5" r="2"/></symbol>
+ <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+ <symbol id="ui-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+ <symbol id="ui-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><ellipse cx="12" cy="12" rx="9.5" ry="5.5"/></symbol>
+ <symbol id="ui-stack" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
+ <symbol id="ui-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></symbol>
+ <symbol id="ui-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></symbol>
+ <symbol id="ui-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+ <symbol id="ui-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+</svg>
+
+<aside class="notes">
+  <h2>My Orbit prototype</h2>
+  This is a clickable test of the Orbit design with example hobbies. Your taps are saved in this browser only.
+  <ol>
+    <li>Tap <b>Log it</b> on Cycling and tick "Finished the next step?"</li>
+    <li>Tap the small <b>Guitar</b> bubble on the outer ring to bring it back.</li>
+    <li>Tap any bubble to see its page, then use <b>Make Focus</b>.</li>
+    <li>Add a hobby with <b>+</b> and try "Just for fun".</li>
+    <li>Log something and <b>add a photo</b>, then look at Cycling's page.</li>
+    <li>Open <b>Hobbies</b> for everything at a glance, and add an idea there.</li>
+  </ol>
+  <button class="reset" id="resetBtn" type="button">Reset example data</button>
+</aside>
+
+<div class="phone" id="app">
+  <section class="view" id="v-orbit" aria-label="Orbit"></section>
+  <section class="view" id="v-ideas" aria-label="Hobbies" hidden></section>
+  <section class="view" id="v-settings" aria-label="Settings" hidden></section>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="orbit" aria-selected="true"><svg class="ic" width="24" height="24"><use href="#ui-orbit"/></svg>Orbit</button>
+    <button class="tab" role="tab" data-tab="ideas" aria-selected="false"><svg class="ic" width="24" height="24"><use href="#ui-stack"/></svg>Hobbies</button>
+    <button class="tab" role="tab" data-tab="settings" aria-selected="false"><svg class="ic" width="24" height="24"><use href="#ui-gear"/></svg>Settings</button>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+  <div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
+</div>
+
+<script>
+(function(){
+const DAY=864e5, KEY='orbit-proto-v2';
+const ICONS=['bike','camera','palette','pot','book','guitar','needle','plant','run','music','climb','code'];
+const TINTS=['coral','violet','leaf','honey','sky','rose','mint','sand'];
+const ago=d=>new Date(Date.now()-d*DAY).toISOString();
+const uid=()=>Math.random().toString(36).slice(2,9);
+// Example "photos" for the seed data (simple drawn scenes, so the prototype has something to show).
+function scene(a,b,c,shapes){ return 'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/>${shapes.replace(/C/g,c)}</svg>`); }
+const PH={
+  coast:scene('#ffd2a8','#f6a07a','#2f5d7c','<circle cx="215" cy="120" r="34" fill="#fff4dc"/><path d="M0 190 Q75 170 150 190 T300 185 V300 H0z" fill="C"/><path d="M0 230 Q90 215 170 232 T300 228 V300 H0z" fill="#234a63"/>'),
+  hill:scene('#cfe6ff','#9cc6ef','#4f7d3a','<path d="M0 210 Q90 120 180 190 T300 170 V300 H0z" fill="C"/><path d="M0 250 Q120 200 300 240 V300 H0z" fill="#3c6530"/><rect x="120" y="225" width="70" height="6" rx="3" fill="#d9c8a6"/>'),
+  garden:scene('#e5f1d8','#b9d9a4','#3f7a3a','<circle cx="70" cy="110" r="42" fill="C"/><circle cx="150" cy="90" r="55" fill="#2f6b30"/><circle cx="235" cy="120" r="40" fill="C"/><rect x="0" y="200" width="300" height="100" fill="#6d9b4f"/><circle cx="90" cy="230" r="9" fill="#f2b8c6"/><circle cx="200" cy="245" r="8" fill="#f7e08a"/>'),
+  sky:scene('#fdf6ec','#fdf6ec','#7aa7d9','<path d="M30 60 Q150 20 270 70 Q260 150 150 140 Q40 150 30 60z" fill="C" opacity=".7"/><path d="M20 170 Q150 130 280 180 Q250 250 150 240 Q50 250 20 170z" fill="#e9a77c" opacity=".55"/><rect x="0" y="0" width="300" height="300" fill="none" stroke="#e7dccb" stroke-width="18"/>'),
+  food:scene('#f4ead9','#e8d7bd','#8a5a2b','<circle cx="150" cy="155" r="95" fill="#fff"/><circle cx="150" cy="155" r="70" fill="#e9b85c"/><circle cx="125" cy="140" r="14" fill="C"/><circle cx="170" cy="170" r="12" fill="#5d8a3a"/><circle cx="160" cy="130" r="9" fill="#c4462f"/>')
+};
+const P=(k)=>PH[k];
+
+function seed(){
+  return {slots:3, hobbies:[
+    {id:'h1',name:'Cycling',icon:'bike',tint:'coral',status:'play',focus:true,
+     goal:{kind:'goal',title:'Ride the 40 km coast loop',next:'A 25 km ride to the lighthouse',ms:[{t:'10 km without stopping',d:1},{t:'First 20 km ride',d:1},{t:'25 km to the lighthouse',d:0},{t:'Full 40 km loop',d:0}]},
+     logs:[{at:ago(2),note:'Windy but fun. Legs were fine.',photos:[P('coast')]},{at:ago(9),note:'First 20 km!',photos:[P('hill')]}],restedAt:null,pickup:null,keeps:0},
+    {id:'h2',name:'Photo walks',icon:'camera',tint:'violet',status:'play',focus:false,
+     goal:{kind:'goal',title:'Shoot and develop a full roll of film',next:'Finish roll 2 at the botanic gardens',ms:[{t:'Load the camera',d:1},{t:'Shoot roll 1',d:1},{t:'Get it developed',d:0}]},
+     logs:[{at:ago(4),note:'',photos:[P('garden')]}],restedAt:null,pickup:null,keeps:0},
+    {id:'h3',name:'Painting',icon:'palette',tint:'leaf',status:'play',focus:false,
+     goal:{kind:'fun',title:'',next:'',ms:[]},logs:[{at:ago(11),note:'Watercolour sky study.',photos:[P('sky')]}],restedAt:null,pickup:null,keeps:0},
+    {id:'h4',name:'Guitar',icon:'guitar',tint:'rose',status:'resting',focus:false,
+     goal:{kind:'goal',title:'Play Blackbird start to finish',next:'Slow practice on bar 7',ms:[{t:'Bars 1–6',d:1},{t:'Bars 7–12',d:0},{t:'Full song',d:0}]},
+     logs:[{at:ago(49),note:'Bars 1–6 clean at 60 bpm.'}],restedAt:ago(44),pickup:'Bars 1–6 clean at 60 bpm. Bar 7 still rough.',keeps:0},
+    {id:'h5',name:'Cooking',icon:'pot',tint:'honey',status:'resting',focus:false,
+     goal:{kind:'goal',title:'Cook five dishes from the Ottolenghi book',next:'Shop for the aubergine recipe',ms:[{t:'Dish 1',d:1},{t:'Dish 2',d:0}]},
+     logs:[{at:ago(20),note:'',photos:[P('food')]}],restedAt:ago(18),pickup:'Did the lentil one. Aubergine next.',keeps:0},
+    {id:'h6',name:'Junk journal',icon:'book',tint:'sky',status:'resting',focus:false,
+     goal:{kind:'fun',title:'',next:'',ms:[]},logs:[{at:ago(30),note:''}],restedAt:ago(25),pickup:'',keeps:0}
+  ], ideas:[
+    {id:'i1',title:'Try pottery wheel class',at:ago(3)},
+    {id:'i2',title:'Learn Blender basics',at:ago(41)},
+    {id:'i3',title:'Make a zine',at:ago(9)}
+  ], archived:[], archivedIdeas:[], prefs:{weekly:true,day:'Sunday',time:'18:00',theme:'system'}};
+}
+let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.hobbies) S=seed();
+S.archivedIdeas=S.archivedIdeas||[]; S.prefs=Object.assign({weekly:true,day:'Sunday',time:'18:00',theme:'system'},S.prefs||{});
+const applyTheme=()=>{ const r=document.documentElement; if(S.prefs.theme==='system') r.removeAttribute('data-theme'); else r.setAttribute('data-theme',S.prefs.theme); };
+applyTheme();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}};
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const H=id=>S.hobbies.find(h=>h.id===id);
+const inPlay=()=>S.hobbies.filter(h=>h.status==='play');
+const resting=()=>S.hobbies.filter(h=>h.status==='resting').sort((a,b)=>Date.parse(a.restedAt)-Date.parse(b.restedAt));
+const focus=()=>inPlay().find(h=>h.focus);
+const lastLog=h=>h.logs.length?Math.max(...h.logs.map(l=>Date.parse(l.at))):null;
+function since(ts){ if(!ts) return 'Not logged yet'; const d=Math.floor((Date.now()-ts)/DAY);
+  return d<=0?'Last time today':d===1?'Last time yesterday':d<14?`Last time ${d} days ago`:`Last time ${Math.round(d/7)} weeks ago`; }
+function restFor(h){ const d=Math.floor((Date.now()-Date.parse(h.restedAt))/DAY); return d<14?`Resting ${Math.max(d,1)} day${d>1?'s':''}`:`Resting ${Math.round(d/7)} weeks`; }
+const disc=(h,size)=>`<span class="disc" style="width:${size}px;height:${size}px;background:var(--t-${h.tint});color:var(--i-${h.tint})"><svg class="ic" width="${Math.round(size*.46)}" height="${Math.round(size*.46)}"><use href="#i-${h.icon}"/></svg></span>`;
+const dotIcon=(h,size)=>`<span class="dot${h.status==='resting'?' rest':''}" style="width:${size}px;height:${size}px;background:var(--t-${h.tint});color:var(--i-${h.tint})"><svg class="ic" width="${Math.round(size*.5)}" height="${Math.round(size*.5)}"><use href="#i-${h.icon}"/></svg></span>`;
+const photosOf=l=>l.photos||[];
+const allPhotos=()=>S.hobbies.flatMap(h=>h.logs.flatMap(l=>photosOf(l).map(src=>({h,src,at:l.at})))).sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+const lastPhoto=h=>{ for(const l of [...h.logs].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at))) if(photosOf(l).length) return photosOf(l)[0]; return null; };
+const fmtDate=at=>new Date(at).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+// Shrinks a picked image to at most 900px on its long side (JPEG), so a few fit in this prototype's browser storage.
+function shrink(file){ return new Promise((ok,bad)=>{ const r=new FileReader(); r.onerror=bad; r.onload=()=>{ const im=new Image(); im.onerror=bad; im.onload=()=>{
+  const k=Math.min(1,900/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.round(im.width*k); c.height=Math.round(im.height*k);
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height); ok(c.toDataURL('image/jpeg',.72)); }; im.src=r.result; }; r.readAsDataURL(file); }); }
+let viewBack=null;
+function sheetPhoto(src,h,at,back){ viewBack=back||null; openSheet(`<div class="sheetbar"><button data-act="photoback" class="s">${back?'Back':'Close'}</button><b>${esc(h.name)}</b><span class="s" style="width:44px;text-align:right">${fmtDate(at)}</span></div><div class="viewer"><img src="${src}" alt="Photo from ${esc(h.name)}, ${fmtDate(at)}"></div>`); }
+function msDots(g){ if(g.kind!=='goal'||!g.ms.length) return ''; return `<span class="dots" aria-label="${g.ms.filter(m=>m.d).length} of ${g.ms.length} milestones">${g.ms.map(m=>`<i class="${m.d?'':'o'}"></i>`).join('')}</span>`; }
+
+/* ---------- ORBIT ---------- */
+let pulseId=null;
+function renderOrbit(){
+  const play=inPlay(), rest=resting(), f=focus(), others=play.filter(h=>!h.focus);
+  const W=$('#v-orbit').clientWidth-40||330, cx=W/2, cy=152;
+  const r1=Math.min(98,W*.29), r2x=Math.min(W/2-26,150), r2y=124;
+  let b='';
+  // centre
+  if(f) b+=bubble(f,cx,cy,88,'focus');
+  else b+=`<button class="bub empty" style="left:${cx}px;top:${cy}px" data-act="pickfocus"><span class="disc" style="width:80px;height:80px"><span style="font-size:11.5px;font-weight:700;text-align:center;line-height:1.2">Pick a<br>Focus</span></span></button>`;
+  // inner ring: other in-play + empty slots
+  const slotsLeft=Math.max(0,S.slots-play.length);
+  const inner=[...others.map(h=>({h})),...Array.from({length:slotsLeft},()=>({empty:true}))];
+  inner.forEach((it,i)=>{ const a=Math.PI*1.2 + i*(2*Math.PI/Math.max(inner.length,1));
+    const x=cx+Math.cos(a)*r1*1.12, y=cy+Math.sin(a)*r1*.95;
+    b+= it.empty?`<button class="bub empty" style="left:${x}px;top:${y}px" data-act="add" aria-label="Add a hobby"><span class="disc" style="width:54px;height:54px"><svg class="ic" width="20" height="20"><use href="#ui-plus"/></svg></span><span class="nm" style="color:var(--faint)">Empty slot</span></button>`
+                   : bubble(it.h,x,y,60,'');
+  });
+  // outer ring: resting
+  const shown=rest.slice(0,6), extra=rest.length-shown.length;
+  const outer=[...shown.map(h=>({h})),...(extra>0?[{more:extra}]:[])];
+  const innerAngs=inner.map((_,i)=>Math.PI*1.2 + i*(2*Math.PI/Math.max(inner.length,1)));
+  const taken=[...innerAngs], outAngs=[];
+  const gap=(a,b)=>{const d=Math.abs(((a-b)%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI);return d;};
+  outer.forEach(()=>{ let best=0,bd=-1; for(let k=0;k<48;k++){ const c=k*Math.PI/24; const d=Math.min(9,...taken.map(t=>gap(c,t))); if(d>bd){bd=d;best=c;} } taken.push(best); outAngs.push(best); });
+  outer.forEach((it,i)=>{ const ang=outAngs[i];
+    const x=cx+Math.cos(ang)*r2x, y=cy+Math.sin(ang)*r2y;
+    b+= it.more?`<button class="bub more" style="left:${x}px;top:${y}px" data-act="tab-settings"><span class="disc" style="width:38px;height:38px">+${it.more}</span></button>`
+                : bubble(it.h,x,y,38,'resting');
+  });
+  const surf=surfacing();
+  const fCard = f ? `
+    <div class="card">
+      <div class="cardhead"><span class="t">${esc(f.name)}</span>${msDots(f.goal)}</div>
+      ${f.goal.kind==='goal'?`<div class="s" style="margin-top:2px">Goal: ${esc(f.goal.title)}</div>`:`<div class="s" style="margin-top:2px">Just for fun</div>`}
+      <div class="next">${f.goal.next?`Next: ${esc(f.goal.next)}`:`<span class="s">No next step. Just enjoy it.</span>`}</div>
+      <button class="btn" data-act="log" data-id="${f.id}">Log it</button>
+    </div>` : `<div class="card"><div class="t">No Focus right now</div><div class="next s">${inPlay().length?'Tap a hobby and pick Focus. The app never picks one for you.':'Tap + to add your first hobby, then pick it as your Focus.'}</div></div>`;
+  $('#v-orbit').innerHTML=`
+    <div class="head"><div><h1>My Orbit</h1><div class="sub">${play.length} in orbit · ${rest.length} resting</div></div>
+      <button class="iconbtn" data-act="new" aria-label="Add an idea or hobby"><svg class="ic" width="20" height="20"><use href="#ui-plus"/></svg></button></div>
+    <div class="orbit" id="orbit">
+      <span class="ring" style="width:${r1*2.24+60}px;height:${r1*1.9+56}px"></span>
+      <span class="ring" style="width:${r2x*2}px;height:${r2y*2}px"></span>
+      ${b}
+    </div>
+    ${surf}
+    <div class="label">Next up</div>${fCard}
+    ${others.length?`<div class="label">In orbit</div>${others.map(h=>`
+      <div class="row"><button style="display:flex;gap:12px;align-items:center;flex:1;min-width:0;text-align:left" data-act="open" data-id="${h.id}">${dotIcon(h,36)}
+        <span class="grow"><span class="t" style="display:block">${esc(h.name)}</span><span class="s">${h.goal.next?esc(h.goal.next):since(lastLog(h))}</span></span></button>
+        <button class="pill" data-act="log" data-id="${h.id}">Log</button></div>`).join('')}`:''}
+  `;
+  ORB={cx,cy,inner:[r1*1.12,r1*.95],outer:[r2x,r2y]}; setupSpin();
+  if(pulseId){ const el=document.querySelector(`.bub[data-id="${pulseId}"]`); if(el){el.classList.add('pulse');} pulseId=null; }
+}
+/* Slow rotation: the whole system turns together (one lap every ~3 minutes), so rings never collide. */
+let ORB=null, spin=0, lastT=0, spinEls=[];
+const SPEED=2*Math.PI/180000; // radians per ms
+const calm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+function setupSpin(){
+  spinEls=[];
+  document.querySelectorAll('#orbit .bub').forEach(el=>{
+    if(el.classList.contains('focus')||el.dataset.act==='pickfocus') return;
+    const ring=(el.classList.contains('resting')||el.classList.contains('more'))?ORB.outer:ORB.inner;
+    const x=parseFloat(el.style.left)-ORB.cx, y=parseFloat(el.style.top)-ORB.cy;
+    spinEls.push({el,ring,base:Math.atan2(y/ring[1],x/ring[0])-spin});
+  });
+  place();
+}
+function place(){ spinEls.forEach(o=>{ const a=o.base+spin; o.el.style.left=(ORB.cx+Math.cos(a)*o.ring[0])+'px'; o.el.style.top=(ORB.cy+Math.sin(a)*o.ring[1])+'px'; }); }
+function tick(t){
+  if(lastT&&!calm()&&!document.hidden&&!$('#v-orbit').hidden&&!$('#sheet').classList.contains('on')){ spin+=Math.min(t-lastT,50)*SPEED; place(); }
+  lastT=t; requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+function bubble(h,x,y,size,cls){
+  return `<button class="bub ${cls}" style="left:${x}px;top:${y}px" data-act="${h.status==='resting'?'swap':'open'}" data-id="${h.id}" aria-label="${esc(h.name)}${h.focus?', Focus':''}${h.status==='resting'?', resting':''}">${disc(h,size)}<span class="nm">${esc(h.name)}${h.focus?' · Focus':''}</span></button>`;
+}
+function surfacing(){
+  const due=resting().find(h=>(Date.now()-Date.parse(h.restedAt))/DAY>=42);
+  if(!due) return '';
+  return `<div class="label">Check in</div><div class="card surf">
+    <div class="big">${dotIcon(due,40)}<div><div class="t">${esc(due.name)}</div><div class="s">${restFor(due)}. Still want it on the bench?</div></div></div>
+    <div class="acts"><button class="btn sm" data-act="swap" data-id="${due.id}">Bring it back</button><button class="btn sm ghost" data-act="keep" data-id="${due.id}">Keep resting</button><button class="btn sm ghost" data-act="archive" data-id="${due.id}">Archive</button></div></div>`;
+}
+
+/* ---------- IDEAS ---------- */
+function renderIdeas(){
+  const play=inPlay(), rest=resting(), f=focus(), order=[...(f?[f]:[]),...play.filter(h=>!h.focus),...rest];
+  $('#v-ideas').innerHTML=`
+    <h1>Hobbies</h1><div class="sub">Everything at a glance, plus ideas you might try one day.</div>
+    <div class="tiles" role="list">
+      <div class="tile" role="listitem"><b>${play.length}<span style="font-size:13px;font-weight:600">/${S.slots}</span></b><span>In orbit</span></div>
+      <div class="tile" role="listitem"><b>${rest.length}</b><span>Resting</span></div>
+      <div class="tile" role="listitem"><b>${S.ideas.length}</b><span>Ideas</span></div>
+      <div class="tile" role="listitem"><b>${S.archived.length}</b><span>Archived</span></div>
+    </div>
+    ${lately()}
+    <div class="loghead"><span class="label" style="margin:0">Your hobbies</span><button class="pill" data-act="add">+ Add Hobbies</button></div>
+    ${order.map(hcard).join('')||'<div class="empty-note">No hobbies yet.</div>'}
+    <div class="loghead"><span class="label" style="margin:0">Ideas</span><button class="pill" data-act="newidea">+ Add Ideas</button></div>
+    ${S.ideas.length?S.ideas.map(i=>`<div class="hcard"><button class="hhead" data-act="openidea" data-id="${i.id}"><span class="dot idea" style="width:36px;height:36px"><svg class="ic" width="17" height="17"><use href="#ui-bulb"/></svg></span><span class="grow"><span class="t" style="display:block">${esc(i.title)}</span><span class="s">Idea · added ${addedAgo(i.at)}</span></span></button></div>`).join(''):'<div class="empty-note">No ideas yet.</div>'}`;
+}
+function addedAgo(at){ const d=Math.floor((Date.now()-Date.parse(at))/DAY); return d<=0?'today':d===1?'yesterday':d<14?`${d} days ago`:d<60?`${Math.round(d/7)} weeks ago`:`${Math.round(d/30)} months ago`; }
+// Activity: every hobby ranked by logs in the last 30 days (van chose the full ranking, 16 Oct).
+function lately(){
+  const cut=Date.now()-30*DAY, n=h=>h.logs.filter(l=>Date.parse(l.at)>=cut).length;
+  const act=S.hobbies.map(h=>({h,c:n(h)})).sort((a,b)=>b.c-a.c||(lastLog(b.h)||0)-(lastLog(a.h)||0));
+  if(!act.length) return '';
+  const max=Math.max(1,...act.map(x=>x.c)), total=act.reduce((t,x)=>t+x.c,0);
+  return `<div class="label">Activity · last 30 days</div><div class="card activity">
+    <div class="s" style="margin-bottom:6px">${total} log${total===1?'':'s'} across ${act.filter(x=>x.c).length} hobb${act.filter(x=>x.c).length===1?'y':'ies'}</div>
+    ${act.map((x,k)=>`<button class="arow" data-act="open" data-id="${x.h.id}"><span class="rk">${k+1}</span>${dotIcon(x.h,24)}<span class="nm">${esc(x.h.name)}</span><span class="bar"><i style="width:${Math.max(x.c?6:0,x.c/max*100)}%;background:var(--i-${x.h.tint})${x.h.status==='resting'?';opacity:.45':''}"></i></span><span class="n">${x.c}</span></button>`).join('')}
+  </div>`;
+}
+// One card per hobby: state, goal progress, up to 3 recent photos and the latest log.
+function hcard(h){
+  const logs=[...h.logs].sort((a,b)=>Date.parse(b.at)-Date.parse(a.at)), last=logs[0], g=h.goal;
+  const pics=logs.flatMap((l,li)=>photosOf(l).map((src,pi)=>({src,l,li:h.logs.indexOf(l),pi}))).slice(0,3);
+  const prog=g.kind==='goal'&&g.ms.length?`${g.ms.filter(m=>m.d).length} of ${g.ms.length} steps`:g.kind==='fun'?'Just for fun':'';
+  const state=h.focus?'Focus':h.status==='play'?'In orbit':restFor(h);
+  return `<div class="hcard${h.status==='resting'?' resting':''}">
+    <div class="top"><button class="hhead" data-act="open" data-id="${h.id}">${dotIcon(h,36)}<span class="grow"><span class="t" style="display:block">${esc(h.name)}</span><span class="s">${state}${prog?' · '+prog:''}</span></span>${msDots(g)}</button></div>
+    ${pics.length?`<div class="thumbs">${pics.map(p=>`<button class="thumb" data-act="viewlog" data-from="glance" data-id="${h.id}" data-li="${p.li}" data-pi="${p.pi}" aria-label="Open photo from ${fmtDate(p.l.at)}"><img src="${p.src}" alt=""></button>`).join('')}</div>`:''}
+    <div class="lastlog s">${last?`<b>${fmtDate(last.at)}</b> ${last.note?esc(last.note):'Logged'}`:'Nothing logged yet'}</div>
+  </div>`;
+}
+function sheetDelete(id){
+  const h=H(id)||S.archived.find(x=>x.id===id), n=h.logs.length, live=!!H(id);
+  openSheet(`<div style="display:flex;justify-content:center;padding:6px 0 2px">${dotIcon(h,56)}</div>
+    <h2 style="text-align:center;margin:10px 0 4px;font-size:21px">Delete ${esc(h.name)}?</h2>
+    <p class="s" style="text-align:center;margin:0 0 16px;font-size:13.5px">${n?`Its ${n} log${n>1?'s':''}, notes and photos go too.`:'It has nothing logged yet.'}${live&&n?' If you might want them later, archive it instead.':''}</p>
+    <div class="stack"><button class="btn" data-act="dodelete" data-id="${id}">Delete</button>
+    ${live&&n?`<button class="btn ghost" data-act="archive" data-id="${id}">Archive instead</button>`:''}
+    <button class="btn ghost" data-act="close">Cancel</button></div>`);
+}
+function sheetIdeaPage(id){
+  const i=S.ideas.find(x=>x.id===id); if(!i) return closeSheet();
+  openSheet(`
+    <div class="big"><span class="dot idea" style="width:56px;height:56px"><svg class="ic" width="26" height="26"><use href="#ui-bulb"/></svg></span><div style="flex:1;min-width:0"><div class="t" style="font-size:20px">${esc(i.title)}</div><div class="s">Idea · added ${addedAgo(i.at)}</div></div><button class="editbtn" data-act="editidea" data-id="${id}" aria-label="Edit idea ${esc(i.title)}"><svg class="ic" width="17" height="17"><use href="#ui-pencil"/></svg></button></div>
+    ${i.link?`<div class="card" style="margin-top:14px;overflow-wrap:anywhere"><div class="s" style="font-weight:700">LINK</div><div style="font-size:14px;margin-top:4px">${esc(i.link)}</div></div>`:''}
+    <div class="card" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><span><span class="t" style="font-size:15px;display:block">Ready to try it?</span><span class="s">It becomes a hobby you can log.</span></span><button class="pill" data-act="promote" data-id="${id}">Start it</button></div>
+    <div class="endlinks"><button class="dellink" data-act="archiveidea" data-id="${id}">Archive idea</button><button class="dellink" data-act="letgo" data-id="${id}">Delete idea</button></div>`);
+}
+function sheetNew(){
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Add something new</b><span style="width:44px"></span></div>
+    <div class="stack" style="margin-top:8px">
+      <button class="row choice" data-act="newidea"><span class="dot idea" style="width:40px;height:40px"><svg class="ic" width="20" height="20"><use href="#ui-bulb"/></svg></span><span class="grow"><span class="t" style="display:block">An idea</span><span class="s">Just a name for now. Start it whenever you like.</span></span></button>
+      <button class="row choice" data-act="add"><span class="dot" style="width:40px;height:40px;background:var(--t-violet);color:var(--i-violet)"><svg class="ic" width="20" height="20"><use href="#ui-plus"/></svg></span><span class="grow"><span class="t" style="display:block">A hobby</span><span class="s">Pick an icon, an optional goal, and put it in orbit or resting.</span></span></button>
+    </div>`);
+}
+function sheetIdea(editId){
+  const ed=editId?S.ideas.find(i=>i.id===editId):null;
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>${ed?'Edit idea':'New idea'}</b><span style="width:44px"></span></div>
+    <form id="ideaForm" class="stack" style="margin-top:8px"><input class="field" id="ideaIn" placeholder="e.g. Try a pottery wheel class" autocomplete="off" aria-label="Idea" value="${esc(ed?.title)}">
+      <input class="field" id="ideaLink" placeholder="Link (optional)" autocomplete="off" aria-label="Link" value="${esc(ed?.link)}"><button class="btn">Save idea</button></form>`,()=>{
+    $('#ideaForm').onsubmit=e=>{e.preventDefault(); const v=$('#ideaIn').value.trim(); if(!v) return $('#ideaIn').focus();
+      if(ed){ ed.title=v; ed.link=$('#ideaLink').value.trim(); } else S.ideas.unshift({id:uid(),title:v,link:$('#ideaLink').value.trim(),at:new Date().toISOString()});
+      save(); closeSheet(); renderIdeas(); toast(ed?'Idea updated':'Idea saved');};
+  });
+}
+
+/* ---------- SETTINGS ---------- */
+function renderSettings(){
+  const P=S.prefs, arch=S.archived.length+S.archivedIdeas.length;
+  const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const TIMES=['08:00','12:00','18:00','20:00'], tl=t=>({'08:00':'8am','12:00':'Noon','18:00':'6pm','20:00':'8pm'}[t]);
+  $('#v-settings').innerHTML=`
+    <h1>Settings</h1>
+    <div class="label">Orbit</div>
+    <div class="line"><span>Hobbies in orbit at once<div class="s">The limit is what makes you choose.</div></span>
+      <span class="stepper"><button data-act="slots" data-d="-1" aria-label="Fewer slots">−</button><b style="min-width:12px;text-align:center">${S.slots}</b><button data-act="slots" data-d="1" aria-label="More slots">+</button></span></div>
+    <div class="line"><span>Weekly check-in<div class="s">${P.weekly?`${P.day}s at ${tl(P.time)}. Only if something needs a look.`:'Off. You can still check in any time.'}</div></span><button class="switch" role="switch" aria-checked="${P.weekly}" data-act="weekly" aria-label="Weekly check-in"></button></div>
+    ${P.weekly?`<div class="line"><span>Day</span><select class="pick" data-pref="day" aria-label="Check-in day">${DAYS.map(d=>`<option ${d===P.day?'selected':''}>${d}</option>`).join('')}</select></div>
+    <div class="line"><span>Time</span><select class="pick" data-pref="time" aria-label="Check-in time">${TIMES.map(t=>`<option value="${t}" ${t===P.time?'selected':''}>${tl(t)}</option>`).join('')}</select></div>`:''}
+    <div class="label">Appearance</div>
+    <div class="seg" role="radiogroup" aria-label="Appearance">${[['system','Match phone'],['light','Light'],['dark','Dark']].map(([k,l])=>`<button role="radio" aria-checked="${P.theme===k}" class="${P.theme===k?'on':''}" data-act="theme" data-k="${k}">${l}</button>`).join('')}</div>
+    <div class="label">Resting (${resting().length})</div>
+    ${resting().map(h=>`<button class="row" data-act="open" data-id="${h.id}">${dotIcon(h,32)}<span class="grow"><span class="t" style="display:block">${esc(h.name)}</span><span class="s">${restFor(h)}</span></span><span class="s">›</span></button>`).join('')||'<div class="empty-note">Nothing resting.</div>'}
+    <div class="label">Archive (${arch})</div>
+    ${S.archived.map(h=>`<div class="row">${dotIcon(h,32)}<span class="grow"><span class="t" style="display:block">${esc(h.name)}</span><span class="s">${h.finished?'Finished hobby':'Archived hobby'}</span></span><button class="pill" data-act="restore" data-id="${h.id}">Restore</button><button class="pill" data-act="delhobby" data-id="${h.id}" aria-label="Delete ${esc(h.name)}">×</button></div>`).join('')}
+    ${S.archivedIdeas.map(i=>`<div class="row"><span class="dot idea" style="width:32px;height:32px"><svg class="ic" width="16" height="16"><use href="#ui-bulb"/></svg></span><span class="grow"><span class="t" style="display:block">${esc(i.title)}</span><span class="s">Archived idea</span></span><button class="pill" data-act="restoreidea" data-id="${i.id}">Restore</button><button class="pill" data-act="delarchidea" data-id="${i.id}" aria-label="Delete ${esc(i.title)}">×</button></div>`).join('')}
+    ${arch?'':'<div class="empty-note">Nothing archived.</div>'}
+    <div class="label">Your data</div>
+    <div class="s" style="margin-bottom:4px">Everything stays on this phone. There's no account and nothing is uploaded.</div>
+    <button class="line linkline" data-act="export" data-k="json"><span>Export everything (JSON)</span><span class="s">›</span></button>
+    <button class="line linkline" data-act="export" data-k="csv"><span>Export logs (CSV)</span><span class="s">›</span></button>
+    <button class="line linkline" data-act="wipe"><span>Delete all data</span><span class="s">›</span></button>
+    <div class="label">About</div>
+    <button class="line linkline" data-act="about" data-k="privacy"><span>Privacy policy</span><span class="s">›</span></button>
+    <button class="line linkline" data-act="about" data-k="support"><span>Help and support</span><span class="s">›</span></button>
+    <div class="s" style="text-align:center;margin-top:18px">My Orbit · prototype</div>
+  `;
+  $('#v-settings').querySelectorAll('select.pick').forEach(el=>el.onchange=()=>{ S.prefs[el.dataset.pref]=el.value; save(); renderSettings(); toast('Check-in updated'); });
+}
+// In the claude.ai viewer, files go through the downloads capability; on a plain web host (e.g. GitHub Pages) a normal download link is used.
+async function saveFile(name,type,text){
+  const dl=window.claude?.use?await window.claude.use('downloads').catch(()=>null):null;
+  if(dl){ try{ await dl.save({filename:name,data:text}); return 'saved'; }catch(e){ return e?.code==='declined'?'declined':'failed'; } }
+  return download(name,type,text)?'saved':'failed';
+}
+function download(name,type,text){ try{ const u=URL.createObjectURL(new Blob([text],{type})); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000); return true; }catch(e){ return false; } }
+function csvOf(){ const q=v=>`"${String(v??'').replace(/"/g,'""')}"`; const rows=[['hobby','status','date','note','photos']];
+  [...S.hobbies,...S.archived].forEach(h=>h.logs.forEach(l=>rows.push([h.name,S.archived.includes(h)?'archived':h.status,l.at.slice(0,10),l.note,photosOf(l).length])));
+  return rows.map(r=>r.map(q).join(',')).join('\n'); }
+function sheetExport(k){
+  const json=k==='json', text=json?JSON.stringify(S,null,2):csvOf(), name=json?'my-orbit-backup.json':'my-orbit-logs.csv';
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Close</button><b>${json?'Export everything':'Export logs'}</b><span style="width:44px"></span></div>
+    <p class="s" style="margin:0 0 10px">${json?'A full backup of your hobbies, goals, logs, photos and ideas.':'One row per log, for spreadsheets.'} About ${Math.max(1,Math.round(text.length/1024))} KB.</p>
+    <textarea class="field" rows="7" readonly style="font-size:12px;font-family:ui-monospace,monospace">${esc(text.slice(0,4000))}${text.length>4000?'\n…':''}</textarea>
+    <div class="stack" style="margin-top:12px"><button class="btn" data-act="dodownload" data-k="${k}">Download ${name}</button><button class="btn ghost" data-act="copyexport" data-k="${k}">Copy to clipboard</button></div>`);
+}
+function sheetWipe(){
+  openSheet(`<h2 style="text-align:center;margin:8px 0 4px;font-size:21px">Delete all data?</h2>
+    <p class="s" style="text-align:center;margin:0 0 16px;font-size:13.5px">All ${S.hobbies.length+S.archived.length} hobbies, their logs and photos, and ${S.ideas.length+S.archivedIdeas.length} ideas are removed from this phone. This can't be undone, so export first if you might want them.</p>
+    <div class="stack"><button class="btn" data-act="dowipe">Delete everything</button><button class="btn ghost" data-act="export" data-k="json">Export first</button><button class="btn ghost" data-act="close">Cancel</button></div>`);
+}
+function sheetAbout(k){
+  const body=k==='privacy'?`<p>My Orbit keeps everything on your phone: hobbies, goals, logs, photos and ideas. There's no account, and nothing is sent to us or anyone else.</p>
+    <p>We don't use analytics or ads. If the app crashes, an anonymous crash report (no hobby content) helps us fix it.</p>
+    <p>Deleting the app or using "Delete all data" removes everything. Your phone's own iCloud backup may include the app's data, as with any app.</p>`
+   :`<p>Questions, bugs or ideas? Email <b>support@[your domain]</b> and a real person will reply.</p><p>Tip: export a backup from Settings before changing phones.</p><p class="s">The support address is a placeholder until launch.</p>`;
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Close</button><b>${k==='privacy'?'Privacy policy':'Help and support'}</b><span style="width:44px"></span></div><div class="prose">${body}</div>`);
+}
+
+/* ---------- SHEETS ---------- */
+function openSheet(html,after){ $('#sheet').innerHTML=`<div class="grab"></div>${html}`; $('#sheet').classList.add('on'); $('#scrim').classList.add('on'); after&&after(); const f=$('#sheet').querySelector('input,textarea,button'); f&&f.focus({preventScroll:true}); }
+function closeSheet(){ $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on'); }
+
+function sheetLog(id){
+  const h=H(id), g=h.goal;
+  openSheet(`
+    <div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>${esc(h.name)}</b><button data-act="savelog" data-id="${id}" style="font-weight:700">Save</button></div>
+    <div class="stack" style="margin-top:8px">
+      <div class="line"><span>When</span><span class="seg" style="width:190px"><button class="on" data-when="0" type="button">Today</button><button data-when="1" type="button">Yesterday</button></span></div>
+      <textarea class="field" id="logNote" rows="3" placeholder="How did it go? (optional)"></textarea>
+      <div><div class="thumbs" id="logPics" style="margin-top:0"></div><input type="file" id="picIn" accept="image/*" multiple hidden></div>
+      ${g.next?`<div class="line"><span>Finished the next step?<div class="s">${esc(g.next)}</div></span><span class="switch" id="doneSw" role="switch" aria-checked="false" tabindex="0"></span></div>
+      <input class="field" id="nextIn" placeholder="What's next?" hidden>`:''}
+      <button class="btn" data-act="savelog" data-id="${id}">Save</button>
+    </div>`,()=>{
+      let when=0; $('#sheet').querySelectorAll('[data-when]').forEach(b=>b.onclick=()=>{when=+b.dataset.when; $('#sheet').querySelectorAll('[data-when]').forEach(x=>x.classList.toggle('on',x===b)); $('#sheet').dataset.when=when;});
+      const sw=$('#doneSw'); if(sw){ const tog=()=>{const on=sw.getAttribute('aria-checked')!=='true'; sw.setAttribute('aria-checked',on); $('#nextIn').hidden=!on; if(on) $('#nextIn').focus();}; sw.onclick=tog; sw.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tog();}}; }
+      $('#sheet').dataset.when=0;
+      logPics=[]; drawPics();
+      $('#picIn').onchange=async e=>{ for(const f of [...e.target.files].slice(0,3-logPics.length)){ try{ logPics.push(await shrink(f)); }catch(err){ toast("That photo couldn't be read"); } } e.target.value=''; drawPics(); };
+    });
+}
+let logPics=[];
+function drawPics(){ const el=$('#logPics'); if(!el) return;
+  el.innerHTML=logPics.map((src,i)=>`<span class="thumb"><img src="${src}" alt="Photo ${i+1}"><button class="x" type="button" data-rm="${i}" aria-label="Remove photo ${i+1}">×</button></span>`).join('')+
+    (logPics.length<3?`<button class="addphoto" type="button" id="addPic" aria-label="Add a photo"><svg class="ic" width="22" height="22"><use href="#i-camera"/></svg></button><span class="s" style="align-self:center">${logPics.length?'Up to 3':'Add a photo (optional)'}</span>`:'');
+  el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ logPics.splice(+b.dataset.rm,1); drawPics(); });
+  const a=$('#addPic'); if(a) a.onclick=()=>$('#picIn').click(); }
+function saveLog(id){
+  const h=H(id), when=+($('#sheet').dataset.when||0);
+  h.logs.unshift({at:new Date(Date.now()-when*DAY).toISOString(),note:$('#logNote').value.trim(),photos:logPics.slice()});
+  const sw=$('#doneSw');
+  if(sw&&sw.getAttribute('aria-checked')==='true'){
+    const nx=$('#nextIn').value.trim();
+    const open=h.goal.ms.find(m=>!m.d); if(open) open.d=1;
+    h.goal.next=nx;
+  }
+  if(!save()&&logPics.length){ h.logs[0].photos=[]; save(); toast("Saved without the photo: this test page's storage is full"); }
+  logPics=[]; closeSheet(); pulseId=id; renderOrbit(); renderIdeas();
+  if(h.goal.kind==='goal'&&h.goal.ms.length&&h.goal.ms.every(m=>m.d)){ setTimeout(()=>sheetGoalHit(id),350); }
+  else toast(`Logged ${h.name}`);
+}
+function sheetGoalHit(id){
+  const h=H(id);
+  openSheet(`<div style="text-align:center;padding:10px 0 4px">${disc(h,84).replace('class="disc"','class="disc" style="margin:0 auto"')}</div>
+    <h2 style="text-align:center;margin:12px 0 4px;font-size:22px">You did it!</h2>
+    <p class="s" style="text-align:center;margin:0 0 16px">${esc(h.goal.title)}</p>
+    <div class="stack"><button class="btn" data-act="newgoal" data-id="${id}">Set the next goal</button><button class="btn ghost" data-act="close">Just celebrate for now</button></div>`);
+}
+
+function sheetHobby(id,pending){
+  const h=H(id), g=h.goal;
+  openSheet(`
+    <div class="big">${dotIcon(h,56)}<div style="flex:1"><div class="t" style="font-size:20px">${esc(h.name)}</div><div class="s">${h.status==='play'?since(lastLog(h)):restFor(h)} · ${h.logs.length} log${h.logs.length===1?'':'s'}</div></div><button class="editbtn" data-act="edithobby" data-id="${id}" aria-label="Edit ${esc(h.name)}"><svg class="ic" width="17" height="17"><use href="#ui-pencil"/></svg></button></div>
+    <div class="seg state" role="radiogroup" aria-label="Where ${esc(h.name)} is" style="margin-top:14px">
+      ${[['focus','Focus'],['play','In orbit'],['rest','Resting']].map(([k,l])=>{ const on=pending?k===pending:k==='focus'?h.focus:k==='play'?(h.status==='play'&&!h.focus):h.status==='resting';
+        return `<button role="radio" aria-checked="${on}" class="${on?'on':''}" data-act="setstate" data-id="${id}" data-s="${k}">${l}</button>`; }).join('')}
+    </div>
+    ${statePanel(h,pending)}
+    <div class="card" style="margin-top:12px">
+      ${g.kind==='goal'?`<div class="cardhead"><span class="s" style="font-weight:700">GOAL</span>${msDots(g)}</div><div class="t" style="font-size:15px;margin-top:4px">${esc(g.title)}</div>
+        <div class="checks" style="margin-top:8px">${g.ms.map((m,i)=>chk(id,m,i)).join('')}
+          <form class="addstep" data-id="${id}"><span class="box add">+</span><input class="stepin" placeholder="Add a step" aria-label="Add a step to ${esc(g.title)}" autocomplete="off"></form></div>`:`<div class="t" style="font-size:15px">Just for fun</div><div class="s">No goal. It grows just by doing it.</div>`}
+      ${g.next?`<div style="margin-top:10px;font-size:14px">Next: ${esc(g.next)}</div>`:''}
+    </div>
+    <div class="loghead"><span class="label" style="margin:0">Log</span><button class="pill" data-act="log" data-id="${id}">+ Add new log</button></div>
+    ${h.logs.map((l,li)=>`<div class="logitem"><div class="s">${fmtDate(l.at)}</div>${l.note?`<div style="font-size:14px">${esc(l.note)}</div>`:''}${photosOf(l).length?`<div class="thumbs">${photosOf(l).map((src,pi)=>`<button class="thumb" data-act="viewlog" data-id="${id}" data-li="${li}" data-pi="${pi}" aria-label="Open photo from ${fmtDate(l.at)}"><img src="${src}" alt=""></button>`).join('')}</div>`:''}</div>`).join('')||'<div class="empty-note">Nothing logged yet.</div>'}
+    <div class="endlinks"><button class="dellink" data-act="archive" data-id="${id}">Archive hobby</button><button class="dellink" data-act="delhobby" data-id="${id}">Delete hobby</button></div>
+  `);
+}
+
+// Inline step under the status switch, so the page keeps its height and the switch stays usable.
+function statePanel(h,pending){
+  if(pending==='rest') return `<div class="statepanel"><div class="s">It keeps its goal, steps and log. Leave yourself a note for when it comes back.</div>
+    <input class="field" id="restNote" placeholder="Where you left off (optional)" value="${esc(h.pickup)}" aria-label="Pick-up note">
+    <div class="row2"><button class="btn sm" data-act="dorestinline" data-id="${h.id}">Rest ${esc(h.name)}</button><button class="btn sm ghost" data-act="open" data-id="${h.id}">Cancel</button></div></div>`;
+  if(pending==='focus'||pending==='play'){ const play=inPlay(), last=play.filter(p=>!p.focus).at(-1)||play.at(-1);
+    return `<div class="statepanel" data-pick="${last.id}"><div class="s">Your orbit is full. Which one rests to make room?</div>
+    ${play.map(p=>`<button class="line pickrow" style="width:100%" data-act="pickout" data-id="${h.id}" data-pick="${p.id}"><span style="display:flex;gap:10px;align-items:center">${dotIcon(p,26)}${esc(p.name)}${p.focus?' <span class="s">Focus</span>':''}</span><span class="radio${p.id===last.id?' on':''}"></span></button>`).join('')}
+    <div class="row2"><button class="btn sm" data-act="dobringinline" data-id="${h.id}" data-s="${pending}">Bring ${esc(h.name)} in</button><button class="btn sm ghost" data-act="open" data-id="${h.id}">Cancel</button></div></div>`; }
+  return '';
+}
+function bringIn(id,k,outId){
+  const before=JSON.stringify(S), h=H(id);
+  if(outId){ const o=H(outId); o.status='resting'; o.focus=false; o.restedAt=new Date().toISOString(); }
+  h.status='play'; h.restedAt=null; h.keeps=0;
+  if(k==='focus'){ S.hobbies.forEach(x=>x.focus=false); h.focus=true; }
+  pulseId=id; save(); renderAll(); sheetHobby(id);
+  toast(`${h.name} is ${k==='focus'?'your Focus':'back in orbit'}`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);});
+}
+function sheetSwap(id){
+  const h=H(id), play=inPlay(), full=play.length>=S.slots;
+  openSheet(`
+    <div class="big">${dotIcon(h,52)}<div><div class="t" style="font-size:19px">${esc(h.name)}</div><div class="s">${restFor(h)}</div></div></div>
+    ${h.pickup?`<div class="label">Where you left off</div><div class="card quote">"${esc(h.pickup)}"</div>`:''}
+    ${h.goal.next?`<div class="s" style="margin-top:8px">Next: ${esc(h.goal.next)}</div>`:''}
+    ${full?`<div class="label">Your orbit is full. What rests?</div>
+      ${play.map((p,i)=>`<button class="line" style="width:100%" data-pick="${p.id}" type="button"><span style="display:flex;gap:10px;align-items:center">${dotIcon(p,28)}${esc(p.name)} ${p.focus?'<span class="s">Focus</span>':''}</span><span class="radio ${i===play.length-1?'on':''}"></span></button>`).join('')}
+      <input class="field" id="pickNote" style="margin-top:10px" placeholder="Pick-up note for the one resting (optional)">`:''}
+    <button class="btn" style="margin-top:14px" data-act="doswap" data-id="${id}">Bring ${esc(h.name)} into orbit</button>
+  `,()=>{
+    let pick=full?play[play.length-1].id:null; $('#sheet').dataset.pick=pick||'';
+    $('#sheet').querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{pick=b.dataset.pick;$('#sheet').dataset.pick=pick;$('#sheet').querySelectorAll('[data-pick] .radio').forEach(r=>r.classList.toggle('on',r.parentElement===b));});
+  });
+}
+function doSwap(id){
+  const before=JSON.stringify(S), h=H(id), outId=$('#sheet').dataset.pick;
+  if(outId){ const o=H(outId); o.status='resting'; o.restedAt=new Date().toISOString(); o.pickup=($('#pickNote')?.value||'').trim()||o.pickup; if(o.focus){o.focus=false;} }
+  h.status='play'; h.restedAt=null; h.keeps=0;
+  save(); closeSheet(); renderOrbit(); renderSettings(); setTab('orbit');
+  toast(`${h.name} is back in orbit`,()=>{S=JSON.parse(before);save();renderAll();});
+  setTimeout(()=>sheetWelcome(id),450);
+}
+function sheetWelcome(id){
+  const h=H(id); if(!h||h.status!=='play') return;
+  const lp=lastPhoto(h);
+  openSheet(`<div class="s" style="font-weight:700;letter-spacing:.6px">BACK IN ORBIT</div><h2 style="margin:4px 0 12px;font-size:24px">Welcome back to ${esc(h.name)}</h2>
+    ${lp?`<img src="${lp}" alt="Your last photo from ${esc(h.name)}" style="width:100%;height:150px;object-fit:cover;border-radius:16px;display:block;margin-bottom:10px">`:''}
+    ${h.pickup?`<div class="card quote">"${esc(h.pickup)}"</div>`:''}
+    ${h.goal.kind==='goal'?`<div class="label">Does this goal still fit?</div><div class="card"><div class="t" style="font-size:15px">${esc(h.goal.title)}</div>${h.goal.next?`<div class="s" style="margin-top:4px">Next: ${esc(h.goal.next)}</div>`:''}</div>
+    <div style="display:flex;gap:8px;margin-top:12px"><button class="btn" data-act="close">Keep it</button><button class="btn ghost" data-act="newgoal" data-id="${id}">Change goal</button></div>`:`<button class="btn" style="margin-top:12px" data-act="close">Done</button>`}`);
+}
+function sheetRest(id){
+  const h=H(id);
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Rest ${esc(h.name)}</b><span style="width:44px"></span></div>
+    <p class="hint">It keeps its goal, next step and history. Leave yourself a note for when it comes back.</p>
+    <input class="field" id="restNote" placeholder="Where you left off (optional)">
+    <button class="btn" style="margin-top:12px" data-act="dorest" data-id="${id}">Rest it</button>`);
+}
+function sheetAdd(prefill){
+  let icon=ICONS[0], tint=TINTS.find(t=>!S.hobbies.some(h=>h.tint===t))||TINTS[0], kind='goal';
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>New hobby</b><span style="width:44px"></span></div>
+    <div class="stack" style="margin-top:8px">
+      <input class="field" id="addName" placeholder="Name, e.g. Pottery" value="${esc(prefill||'')}">
+      <div class="grid-icons" id="iconGrid">${ICONS.map(i=>`<button type="button" data-icon="${i}" aria-label="${i}"><svg class="ic" width="22" height="22"><use href="#i-${i}"/></svg></button>`).join('')}</div>
+      <div class="tints" id="tintRow">${TINTS.map(t=>`<button type="button" data-tint="${t}" style="background:var(--t-${t})" aria-label="${t}"></button>`).join('')}</div>
+      <div class="seg" id="kindSeg"><button type="button" data-kind="goal" class="on">Has a goal</button><button type="button" data-kind="fun">Just for fun</button></div>
+      <div id="goalBits" class="stack">
+        <input class="field" id="addGoal" placeholder="What would done look like?">
+        <div class="hint" id="vagueHint" hidden>"Get better" is hard to finish. Try something you could point to, like a finished piece.</div>
+        <input class="field" id="addNext" placeholder="First small step (optional)">
+      </div>
+      <div class="line"><span>Put it</span><span class="seg" id="whereSeg" style="width:200px"><button type="button" data-where="play" class="on">In orbit</button><button type="button" data-where="resting">Resting</button></span></div>
+      <button class="btn" data-act="doadd">Add hobby</button>
+    </div>`,()=>{
+      const sh=$('#sheet'); sh.dataset.where='play';
+      const paint=()=>{ sh.querySelectorAll('[data-icon]').forEach(b=>{b.classList.toggle('on',b.dataset.icon===icon); b.style.background=b.dataset.icon===icon?`var(--t-${tint})`:''; b.style.color=b.dataset.icon===icon?`var(--i-${tint})`:'';});
+        sh.querySelectorAll('[data-tint]').forEach(b=>b.classList.toggle('on',b.dataset.tint===tint)); sh.dataset.icon=icon; sh.dataset.tint=tint; sh.dataset.kind=kind;};
+      sh.querySelectorAll('[data-icon]').forEach(b=>b.onclick=()=>{icon=b.dataset.icon;paint();});
+      sh.querySelectorAll('[data-tint]').forEach(b=>b.onclick=()=>{tint=b.dataset.tint;paint();});
+      sh.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;sh.querySelectorAll('[data-kind]').forEach(x=>x.classList.toggle('on',x===b));$('#goalBits').hidden=kind==='fun';paint();});
+      sh.querySelectorAll('[data-where]').forEach(b=>b.onclick=()=>{sh.dataset.where=b.dataset.where;sh.querySelectorAll('[data-where]').forEach(x=>x.classList.toggle('on',x===b));});
+      $('#addGoal').oninput=e=>{$('#vagueHint').hidden=!/^(get|be|become)\s+(better|good)/i.test(e.target.value.trim());};
+      paint();
+    });
+}
+function doAdd(){
+  const sh=$('#sheet'), name=$('#addName').value.trim(); if(!name){$('#addName').focus();return;}
+  let where=sh.dataset.where; if(where==='play'&&inPlay().length>=S.slots){ where='resting'; }
+  const kind=sh.dataset.kind, g=kind==='fun'?{kind:'fun',title:'',next:'',ms:[]}:{kind:'goal',title:$('#addGoal').value.trim()||'Decide later',next:$('#addNext').value.trim(),ms:[]};
+  const h={id:uid(),name,icon:sh.dataset.icon,tint:sh.dataset.tint,status:where,focus:false,goal:g,logs:[],restedAt:where==='resting'?new Date().toISOString():null,pickup:'',keeps:0};
+  if(where==='play'&&!focus()) h.focus=false;
+  S.hobbies.push(h);
+  if(sh.dataset.ideaId){ S.ideas=S.ideas.filter(i=>i.id!==sh.dataset.ideaId); }
+  save(); closeSheet(); renderAll(); setTab('orbit');
+  toast(where!==sh.dataset.where?`Orbit is full, so ${name} is resting for now`:`${name} added`);
+}
+const chk=(id,m,i)=>`<button class="chk${m.d?' on':''}" role="checkbox" aria-checked="${!!m.d}" data-act="togms" data-id="${id}" data-i="${i}"><span class="box">${m.d?'<svg class="ic" width="14" height="14" viewBox="0 0 24 24" style="stroke-width:3.5"><path d="M5 12l5 5 9-10"/></svg>':''}</span><span class="tx">${esc(m.t)}</span></button>`;
+function togMs(t){
+  const h=H(t.dataset.id), g=h.goal, m=g.ms[+t.dataset.i]; m.d=m.d?0:1; save();
+  t.outerHTML=chk(h.id,m,+t.dataset.i);
+  const d=$('#sheet .cardhead .dots'); if(d) d.outerHTML=msDots(g);
+  renderOrbit(); renderIdeas();
+  if(m.d&&g.ms.every(x=>x.d)) setTimeout(()=>sheetGoalHit(h.id),450);
+}
+document.addEventListener('submit',e=>{ const f=e.target.closest('.addstep'); if(!f) return; e.preventDefault();
+  const v=f.querySelector('.stepin').value.trim(); if(!v) return; const h=H(f.dataset.id); h.goal.ms.push({t:v,d:0}); save();
+  f.insertAdjacentHTML('beforebegin',chk(h.id,h.goal.ms.at(-1),h.goal.ms.length-1)); f.querySelector('.stepin').value='';
+  const d=$('#sheet .cardhead .dots'); if(d) d.outerHTML=msDots(h.goal); renderOrbit(); renderIdeas(); });
+function sheetEditHobby(id){
+  const h=H(id)||S.archived.find(x=>x.id===id), g=h.goal; let icon=h.icon, tint=h.tint, kind=g.kind==='fun'?'fun':'goal';
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Edit hobby</b><button data-act="saveedit" data-id="${id}" style="font-weight:700">Save</button></div>
+    <div class="stack" style="margin-top:8px">
+      <input class="field" id="edName" placeholder="Name" value="${esc(h.name)}" aria-label="Name">
+      <div class="grid-icons">${ICONS.map(i=>`<button type="button" data-icon="${i}" aria-label="${i}"><svg class="ic" width="22" height="22"><use href="#i-${i}"/></svg></button>`).join('')}</div>
+      <div class="tints">${TINTS.map(t=>`<button type="button" data-tint="${t}" style="background:var(--t-${t})" aria-label="${t}"></button>`).join('')}</div>
+      <div class="seg"><button type="button" data-kind="goal">Has a goal</button><button type="button" data-kind="fun">Just for fun</button></div>
+      <div id="edGoalBits" class="stack"><input class="field" id="edGoal" placeholder="What would done look like?" value="${esc(g.title==='Decide later'?'':g.title)}" aria-label="Goal"></div>
+      <input class="field" id="edNext" placeholder="Next small step (optional)" value="${esc(g.next)}" aria-label="Next step">
+      <button class="btn" data-act="saveedit" data-id="${id}">Save changes</button>
+    </div>`,()=>{
+      const sh=$('#sheet');
+      const paint=()=>{ sh.querySelectorAll('[data-icon]').forEach(b=>{const on=b.dataset.icon===icon; b.classList.toggle('on',on); b.style.background=on?`var(--t-${tint})`:''; b.style.color=on?`var(--i-${tint})`:'';});
+        sh.querySelectorAll('[data-tint]').forEach(b=>b.classList.toggle('on',b.dataset.tint===tint));
+        sh.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('on',b.dataset.kind===kind)); $('#edGoalBits').style.display=kind==='fun'?'none':'';
+        sh.dataset.icon=icon; sh.dataset.tint=tint; sh.dataset.kind=kind; };
+      sh.querySelectorAll('[data-icon]').forEach(b=>b.onclick=()=>{icon=b.dataset.icon;paint();});
+      sh.querySelectorAll('[data-tint]').forEach(b=>b.onclick=()=>{tint=b.dataset.tint;paint();});
+      sh.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;paint();});
+      paint();
+    });
+}
+function saveEdit(id){
+  const h=H(id)||S.archived.find(x=>x.id===id), sh=$('#sheet'), name=$('#edName').value.trim(); if(!name) return $('#edName').focus();
+  const kind=sh.dataset.kind, next=$('#edNext').value.trim();
+  h.name=name; h.icon=sh.dataset.icon; h.tint=sh.dataset.tint;
+  if(kind==='fun') h.goal={kind:'fun',title:'',next,ms:[]};
+  else { const t=$('#edGoal').value.trim()||'Decide later'; h.goal=h.goal.kind==='goal'?{...h.goal,title:t,next}:{kind:'goal',title:t,next,ms:[]}; }
+  save(); renderAll(); H(id)?sheetHobby(id):closeSheet(); toast(`${name} updated`);
+}
+function sheetNewGoal(id){
+  const h=H(id);
+  openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Next goal</b><span style="width:44px"></span></div>
+    <p class="hint">${esc(h.name)}. What would done look like this time?</p>
+    <input class="field" id="ngGoal" placeholder="e.g. Play two songs back to back">
+    <input class="field" id="ngNext" style="margin-top:8px" placeholder="First small step (optional)">
+    <div style="display:flex;gap:8px;margin-top:12px"><button class="btn" data-act="savegoal" data-id="${id}">Save goal</button><button class="btn ghost" data-act="funmode" data-id="${id}">Just for fun</button></div>`);
+}
+
+/* ---------- ACTIONS ---------- */
+let undoFn=null, toastT;
+function toast(msg,undo){ $('#toastMsg').textContent=msg; undoFn=undo||null; $('#toastUndo').hidden=!undo; $('#toast').classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>$('#toast').classList.remove('on'),undo?10000:2600); }
+$('#toastUndo').onclick=()=>{ undoFn&&undoFn(); $('#toast').classList.remove('on'); toast('Undone'); };
+$('#scrim').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]'); if(!t) return;
+  const id=t.dataset.id, a=t.dataset.act;
+  if(a==='close') return closeSheet();
+  if(a==='weekly'){ S.prefs.weekly=!S.prefs.weekly; save(); renderSettings(); return toast(S.prefs.weekly?'Weekly check-in on':'Weekly check-in off'); }
+  if(a==='theme'){ S.prefs.theme=t.dataset.k; save(); applyTheme(); return renderSettings(); }
+  if(a==='export') return sheetExport(t.dataset.k);
+  if(a==='dodownload'){ const k=t.dataset.k; (k==='json'?saveFile('my-orbit-backup.json','application/json',JSON.stringify(S,null,2)):saveFile('my-orbit-logs.csv','text/csv',csvOf())).then(r=>toast(r==='saved'?'Saved':r==='declined'?'Not saved':"Couldn't save here. Use Copy instead")); return; }
+  if(a==='copyexport'){ const k=t.dataset.k, txt=k==='json'?JSON.stringify(S,null,2):csvOf(); (navigator.clipboard?.writeText(txt)||Promise.reject()).then(()=>toast('Copied'),()=>toast("Couldn't copy here")); return; }
+  if(a==='wipe') return sheetWipe();
+  if(a==='dowipe'){ S={slots:S.slots,hobbies:[],ideas:[],archived:[],archivedIdeas:[],prefs:S.prefs}; save(); closeSheet(); renderAll(); setTab('orbit'); return toast('All data deleted'); }
+  if(a==='about') return sheetAbout(t.dataset.k);
+  if(a==='archiveidea'){ const before=JSON.stringify(S),i=S.ideas.find(x=>x.id===id); S.ideas=S.ideas.filter(x=>x.id!==id); S.archivedIdeas.unshift(i); save(); closeSheet(); renderAll(); return toast('Idea archived',()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='restoreidea'){ const i=S.archivedIdeas.find(x=>x.id===id); S.archivedIdeas=S.archivedIdeas.filter(x=>x.id!==id); S.ideas.unshift(i); save(); renderAll(); return toast(`"${i.title}" is back in Ideas`); }
+  if(a==='delarchidea'){ const before=JSON.stringify(S),i=S.archivedIdeas.find(x=>x.id===id); S.archivedIdeas=S.archivedIdeas.filter(x=>x.id!==id); save(); renderAll(); return toast('Idea deleted',()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='openidea') return sheetIdeaPage(id);
+  if(a==='setstate'){ const h=H(id), k=t.dataset.s;
+    if(k==='rest') return h.status==='play'?sheetHobby(id,'rest'):sheetHobby(id);
+    if(h.status==='resting') return inPlay().length<S.slots?bringIn(id,k,null):sheetHobby(id,k);
+    if(k==='focus'&&!h.focus){ S.hobbies.forEach(x=>x.focus=false); h.focus=true; pulseId=id; save(); renderAll(); sheetHobby(id); return toast(`${h.name} is your Focus`); }
+    if(k==='play'&&h.focus){ h.focus=false; save(); renderAll(); sheetHobby(id); return toast(`${h.name} is in orbit, no Focus set`); }
+    return sheetHobby(id); }
+  if(a==='pickout'){ const pn=t.closest('.statepanel'); pn.dataset.pick=t.dataset.pick; pn.querySelectorAll('.radio').forEach(r=>r.classList.toggle('on',r.parentElement===t)); return; }
+  if(a==='dobringinline') return bringIn(id,t.dataset.s,t.closest('.statepanel').dataset.pick);
+  if(a==='dorestinline'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); h.pickup=$('#restNote').value.trim()||h.pickup; save(); renderAll(); sheetHobby(id); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();sheetHobby(id);}); }
+  if(a==='togms') return togMs(t);
+  if(a==='edithobby') return sheetEditHobby(id);
+  if(a==='saveedit') return saveEdit(id);
+  if(a==='editidea') return sheetIdea(id);
+  if(a==='delhobby') return sheetDelete(id);
+  if(a==='dodelete'){ const before=JSON.stringify(S), h=H(id)||S.archived.find(x=>x.id===id); S.hobbies=S.hobbies.filter(x=>x.id!==id); S.archived=S.archived.filter(x=>x.id!==id); save(); closeSheet(); renderAll(); return toast(`${h.name} deleted`,()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='new') return sheetNew();
+  if(a==='newidea') return sheetIdea();
+  if(a==='viewlog'){ const h=H(id), l=h.logs[+t.dataset.li]; return sheetPhoto(photosOf(l)[+t.dataset.pi],h,l.at,t.dataset.from?null:id); }
+  if(a==='viewrecent'){ const p=allPhotos()[+t.dataset.i]; return sheetPhoto(p.src,p.h,p.at,null); }
+  if(a==='photoback'){ return viewBack?sheetHobby(viewBack):closeSheet(); }
+  if(a==='open') return sheetHobby(id);
+  if(a==='log') return sheetLog(id);
+  if(a==='savelog') return saveLog(id);
+  if(a==='swap') return sheetSwap(id);
+  if(a==='doswap') return doSwap(id);
+  if(a==='add') return sheetAdd();
+  if(a==='doadd') return doAdd();
+  if(a==='pickfocus'){ const p=inPlay()[0]; if(p) return sheetHobby(p.id); return sheetAdd(); }
+  if(a==='makefocus'){ S.hobbies.forEach(h=>h.focus=false); H(id).focus=true; save(); closeSheet(); pulseId=id; renderOrbit(); return toast(`${H(id).name} is your Focus`); }
+  if(a==='rest') return sheetRest(id);
+  if(a==='dorest'){ const before=JSON.stringify(S),h=H(id); h.status='resting'; h.focus=false; h.restedAt=new Date().toISOString(); h.pickup=$('#restNote').value.trim()||h.pickup; save(); closeSheet(); renderAll(); return toast(`${h.name} is resting`,()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='keep'){ const h=H(id); h.restedAt=new Date().toISOString(); h.keeps++; save(); renderAll(); return toast(`${h.name} keeps resting. I'll ask again in 6 weeks.`); }
+  if(a==='archive'){ const before=JSON.stringify(S),h=H(id); S.hobbies=S.hobbies.filter(x=>x.id!==id); h.focus=false; S.archived.unshift(h); save(); closeSheet(); renderAll(); return toast(`${h.name} archived`,()=>{S=JSON.parse(before);save();renderAll();}); }
+  if(a==='restore'){ const h=S.archived.find(x=>x.id===id); S.archived=S.archived.filter(x=>x.id!==id); h.status='resting'; h.restedAt=new Date().toISOString(); S.hobbies.push(h); save(); renderAll(); return toast(`${h.name} is resting again`); }
+  if(a==='newgoal') return sheetNewGoal(id);
+  if(a==='savegoal'){ const h=H(id),v=$('#ngGoal').value.trim(); if(!v) return $('#ngGoal').focus(); h.goal={kind:'goal',title:v,next:$('#ngNext').value.trim(),ms:[]}; save(); closeSheet(); renderAll(); return toast('New goal set'); }
+  if(a==='funmode'){ const h=H(id); h.goal={kind:'fun',title:'',next:'',ms:[]}; save(); closeSheet(); renderAll(); return toast(`${h.name} is just for fun now`); }
+  if(a==='promote'){ const i=S.ideas.find(x=>x.id===id); sheetAdd(i.title); $('#sheet').dataset.ideaId=id; return; }
+  if(a==='letgo'){ const before=JSON.stringify(S),i=S.ideas.find(x=>x.id===id); S.ideas=S.ideas.filter(x=>x.id!==id); save(); closeSheet(); renderIdeas(); return toast(`Idea deleted`,()=>{S=JSON.parse(before);save();renderIdeas();}); }
+  if(a==='slots'){ const n=Math.min(5,Math.max(1,S.slots+ +t.dataset.d)); if(n<inPlay().length) return toast(`Rest a hobby first. ${inPlay().length} are in orbit.`); S.slots=n; save(); renderAll(); return; }
+  if(a==='tab-settings') return setTab('settings');
+});
+function resetAll(){ S=seed(); save(); applyTheme(); closeSheet(); renderAll(); setTab('orbit'); toast('Example data reset'); }
+$('#resetBtn').onclick=resetAll;
+
+function setTab(name){
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===name));
+  ['orbit','ideas','settings'].forEach(n=>$('#v-'+n).hidden=n!==name);
+  if(name==='orbit') renderOrbit(); if(name==='ideas') renderIdeas(); if(name==='settings') renderSettings();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+function renderAll(){ renderOrbit(); renderIdeas(); renderSettings(); }
+window.addEventListener('resize',()=>{ if(!$('#v-orbit').hidden) renderOrbit(); });
+renderAll();
+})();
+</script>
+
+</body>
+</html>
