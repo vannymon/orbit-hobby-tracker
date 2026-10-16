@@ -187,6 +187,8 @@ h1{font-size:30px;font-weight:800;letter-spacing:-.6px;margin:0}
 .linkline{width:100%;text-align:left}
 select.pick{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:0;border-radius:10px;padding:7px 10px}
 .prose{font-size:14.5px;line-height:1.5}.prose p{margin:0 0 10px}
+.pastgoal{border-bottom:1px solid var(--line)}.pastgoal summary{display:flex;gap:10px;align-items:center;padding:8px 0;cursor:pointer;list-style:none}.pastgoal summary::-webkit-details-marker{display:none}
+.pg-ic{width:20px;text-align:center;color:var(--soft);font-weight:700}.goaltag{color:var(--soft);font-style:italic}
 .loghead{display:flex;justify-content:space-between;align-items:center;margin:20px 0 4px}
 .seg.state button.on{font-weight:700}
 .endlinks{display:grid;gap:14px;margin:24px 0 4px}
@@ -575,7 +577,7 @@ function drawPics(){ const el=$('#logPics'); if(!el) return;
   const a=$('#addPic'); if(a) a.onclick=()=>$('#picIn').click(); }
 function saveLog(id){
   const h=H(id), when=+($('#sheet').dataset.when||0);
-  h.logs.unshift({at:new Date(Date.now()-when*DAY).toISOString(),note:$('#logNote').value.trim(),photos:logPics.slice()});
+  h.logs.unshift({at:new Date(Date.now()-when*DAY).toISOString(),note:$('#logNote').value.trim(),photos:logPics.slice(),goal:h.goal.kind==='goal'?h.goal.title:''});
   const sw=$('#doneSw');
   if(sw&&sw.getAttribute('aria-checked')==='true'){
     const nx=$('#nextIn').value.trim();
@@ -610,8 +612,11 @@ function sheetHobby(id,pending){
           <form class="addstep" data-id="${id}"><span class="box add">+</span><input class="stepin" placeholder="Add a step" aria-label="Add a step to ${esc(g.title)}" autocomplete="off"></form></div>`:`<div class="t" style="font-size:15px">Just for fun</div><div class="s">No goal. It grows just by doing it.</div>`}
       ${g.next?`<div style="margin-top:10px;font-size:14px">Next: ${esc(g.next)}</div>`:''}
     </div>
+    ${(h.pastGoals||[]).length?`<div class="label">Past goals</div>${h.pastGoals.map(pg=>{ const n=pg.ms.filter(m=>m.d).length;
+      return `<details class="pastgoal"><summary><span class="pg-ic">${pg.done?'✓':'○'}</span><span class="grow"><span class="t" style="display:block;font-size:14.5px">${esc(pg.title)}</span><span class="s">${pg.done?'Finished':'Set aside'} ${fmtDate(pg.endedAt)}${pg.ms.length?` · ${n} of ${pg.ms.length} steps`:''}</span></span></summary>
+        ${pg.ms.length?`<div class="s" style="padding:4px 0 2px 30px;line-height:1.7">${pg.ms.map(m=>`${m.d?'✓':'○'} ${esc(m.t)}`).join('<br>')}</div>`:''}</details>`; }).join('')}`:''}
     <div class="loghead"><span class="label" style="margin:0">Log</span><button class="pill" data-act="log" data-id="${id}">+ Add new log</button></div>
-    ${h.logs.map((l,li)=>`<div class="logitem"><div class="s">${fmtDate(l.at)}</div>${l.note?`<div style="font-size:14px">${esc(l.note)}</div>`:''}${photosOf(l).length?`<div class="thumbs">${photosOf(l).map((src,pi)=>`<button class="thumb" data-act="viewlog" data-id="${id}" data-li="${li}" data-pi="${pi}" aria-label="Open photo from ${fmtDate(l.at)}"><img src="${src}" alt=""></button>`).join('')}</div>`:''}</div>`).join('')||'<div class="empty-note">Nothing logged yet.</div>'}
+    ${h.logs.map((l,li)=>`<div class="logitem"><div class="s">${fmtDate(l.at)}${l.goal&&l.goal!==g.title?` · <span class="goaltag">${esc(l.goal)}</span>`:''}</div>${l.note?`<div style="font-size:14px">${esc(l.note)}</div>`:''}${photosOf(l).length?`<div class="thumbs">${photosOf(l).map((src,pi)=>`<button class="thumb" data-act="viewlog" data-id="${id}" data-li="${li}" data-pi="${pi}" aria-label="Open photo from ${fmtDate(l.at)}"><img src="${src}" alt=""></button>`).join('')}</div>`:''}</div>`).join('')||'<div class="empty-note">Nothing logged yet.</div>'}
     <div class="endlinks"><button class="dellink" data-act="archive" data-id="${id}">Archive hobby</button><button class="dellink" data-act="delhobby" data-id="${id}">Delete hobby</button></div>
   `);
 }
@@ -751,10 +756,13 @@ function saveEdit(id){
   const h=H(id)||S.archived.find(x=>x.id===id), sh=$('#sheet'), name=$('#edName').value.trim(); if(!name) return $('#edName').focus();
   const kind=sh.dataset.kind, next=$('#edNext').value.trim();
   h.name=name; h.icon=sh.dataset.icon; h.tint=sh.dataset.tint;
-  if(kind==='fun') h.goal={kind:'fun',title:'',next,ms:[]};
+  if(kind==='fun'){ retireGoal(h); h.goal={kind:'fun',title:'',next,ms:[]}; }
   else { const t=$('#edGoal').value.trim()||'Decide later'; h.goal=h.goal.kind==='goal'?{...h.goal,title:t,next}:{kind:'goal',title:t,next,ms:[]}; }
   save(); renderAll(); H(id)?sheetHobby(id):closeSheet(); toast(`${name} updated`);
 }
+// Keeps the old goal (and its steps) in pastGoals whenever it is replaced, so nothing is lost.
+function retireGoal(h){ const g=h.goal; if(g.kind!=='goal'||!g.title||g.title==='Decide later') return;
+  h.pastGoals=h.pastGoals||[]; h.pastGoals.unshift({title:g.title,ms:g.ms.map(m=>({...m})),done:!!g.ms.length&&g.ms.every(m=>m.d),endedAt:new Date().toISOString()}); }
 function sheetNewGoal(id){
   const h=H(id);
   openSheet(`<div class="sheetbar"><button data-act="close" class="s">Cancel</button><b>Next goal</b><span style="width:44px"></span></div>
@@ -822,8 +830,8 @@ document.addEventListener('click',e=>{
   if(a==='archive'){ const before=JSON.stringify(S),h=H(id); S.hobbies=S.hobbies.filter(x=>x.id!==id); h.focus=false; S.archived.unshift(h); save(); closeSheet(); renderAll(); return toast(`${h.name} archived`,()=>{S=JSON.parse(before);save();renderAll();}); }
   if(a==='restore'){ const h=S.archived.find(x=>x.id===id); S.archived=S.archived.filter(x=>x.id!==id); h.status='resting'; h.restedAt=new Date().toISOString(); S.hobbies.push(h); save(); renderAll(); return toast(`${h.name} is resting again`); }
   if(a==='newgoal') return sheetNewGoal(id);
-  if(a==='savegoal'){ const h=H(id),v=$('#ngGoal').value.trim(); if(!v) return $('#ngGoal').focus(); h.goal={kind:'goal',title:v,next:$('#ngNext').value.trim(),ms:[]}; save(); closeSheet(); renderAll(); return toast('New goal set'); }
-  if(a==='funmode'){ const h=H(id); h.goal={kind:'fun',title:'',next:'',ms:[]}; save(); closeSheet(); renderAll(); return toast(`${h.name} is just for fun now`); }
+  if(a==='savegoal'){ const h=H(id),v=$('#ngGoal').value.trim(); if(!v) return $('#ngGoal').focus(); retireGoal(h); h.goal={kind:'goal',title:v,next:$('#ngNext').value.trim(),ms:[]}; save(); closeSheet(); renderAll(); return toast('New goal set'); }
+  if(a==='funmode'){ const h=H(id); retireGoal(h); h.goal={kind:'fun',title:'',next:'',ms:[]}; save(); closeSheet(); renderAll(); return toast(`${h.name} is just for fun now`); }
   if(a==='promote'){ const i=S.ideas.find(x=>x.id===id); sheetAdd(i.title); $('#sheet').dataset.ideaId=id; return; }
   if(a==='letgo'){ const before=JSON.stringify(S),i=S.ideas.find(x=>x.id===id); S.ideas=S.ideas.filter(x=>x.id!==id); save(); closeSheet(); renderIdeas(); return toast(`Idea deleted`,()=>{S=JSON.parse(before);save();renderIdeas();}); }
   if(a==='slots'){ const n=Math.min(5,Math.max(1,S.slots+ +t.dataset.d)); if(n<inPlay().length) return toast(`Rest a hobby first. ${inPlay().length} are in orbit.`); S.slots=n; save(); renderAll(); return; }

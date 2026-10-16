@@ -44,6 +44,7 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
   - **Focus on a hobby already in orbit:** it becomes the Focus, and the old Focus stays in orbit.
   - **In orbit on the Focus:** it stops being Focus, and nothing becomes Focus automatically.
 - **Goal card:** the goal title and progress dots, then the steps as **checkboxes**. Tap a step to tick or untick it. **Add a step** at the end adds one. Ticking the last open step shows "You did it!" with **Set the next goal** or **Just celebrate for now**. A "Just for fun" hobby shows "No goal. It grows just by doing it." The next step shows under the goal.
+- **Past goals (van, 16 Oct):** setting a new goal, or switching to Just for fun, never deletes the old one. It moves to a **Past goals** list above the Log, marked ✓ Finished (all steps ticked) or ○ Set aside, with its date and "3 of 3 steps". Tap to see its steps. Logs are always kept. Each log also remembers the goal it was made under, shown in grey when that's no longer the current goal.
 - **Log:** a "Log" heading with a small **+ Add new log** button beside it. Logs are newest first, each with its date, note and photo thumbnails. Tapping a photo shows it full size.
 - **Bottom:** small links **Archive hobby** and then **Delete hobby**. There are no big action buttons on this page.
 
@@ -128,8 +129,8 @@ Three tabs: **Orbit · Hobbies · Settings**. Hobby, idea, log and other details
 ## 4. Data model (changes from van's Expo prototype)
 
 - **Hobby:** `id, name, icon, tint, status ('play' | 'resting'), focus, goal, logs[], restedAt, pickup, keeps, hasEnd, finished`. Add `icon` and `tint`, and remove `flameName` and the flame art fields.
-- **Goal:** `kind ('goal' | 'just_for_fun'), title, next, steps[] {text, done}`.
-- **Log:** `at, note, photos[]`. Photos are file paths in the app. Drop `kind` and `snack`.
+- **Goal:** `kind ('goal' | 'just_for_fun'), title, next, steps[] {text, done}`. Hobby also keeps `pastGoals[] {title, steps, done, endedAt}`.
+- **Log:** `at, note, photos[], goal` (the goal title at the time). Photos are file paths in the app. Drop `kind` and `snack`.
 - **Idea:** `id, title, link, addedAt`.
 - **Archived** hobbies and ideas are kept in their own lists so they can be restored.
 - **Settings:** `slots, weekly {on, day, time}, theme ('system' | 'light' | 'dark')`.
